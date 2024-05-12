@@ -1,0 +1,42 @@
+.container {
+    display: flex; /* Flexbox を使用してコンテナ内の要素を配置 */
+    flex-direction: column; /* 垂直方向に要素を配置 */
+    height: 100vh; /* コンテナをビューポートの高さいっぱいに設定 */
+}
+
+.form-container {
+     /* b-form が残りの空間を占めるようにする */
+    flex: 1; 
+    margin: 10px; 
+    padding: 10px;    
+}
+.b-table {
+    flex: 2; /* b-table が b-form の 2 倍の高さを持つようにする */
+}
+
+p {
+    margin-right: 10px; 
+}
+
+.form {
+    margin-right: 10px; 
+}
+
+.mb-2{
+    margin-right: 10px;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px; /* カレンダーの下に少しスペースを開けるため */
+}
+
+.totalCount{
+    margin: 10px; 
+    padding: 10px;
+}
+
+.register{
+    margin-left: auto; /* 左側のマージンを自動的に拡張してボタンを右側に移動 */
+}
