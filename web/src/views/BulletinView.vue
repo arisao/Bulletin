@@ -145,6 +145,7 @@ export default {
             },
             url: null,
             uploadFile: '',
+            result: []
         }
     },
     //インスタンスが生成された後で実行される
@@ -168,17 +169,23 @@ export default {
             }
         },
         search() {
-            //入力した値を格納する
-            const form = {};
-            //バリデーションチェックのメソッドを呼び出す
+            // 入力した値を格納する
+            this.form = {
+                title: this.text,  // 例: 題名を入力フィールドから取得
+                startDate: this.day2,
+                endDate: this.day1
+            };
+
+            // バリデーションチェックのメソッドを呼び出す
             this.formCheck();
-            // APIを呼び出す
-            //get parameterで呼び出し
-            axios.post("http://localhost:8080/bulletin")
-                .then(response => {
-                    // レスポンスを処理する（必要に応じて）
-                    console.log(response);
-                })
+
+            axios.post(
+                'http://localhost:8080/bulletin',
+                this.form  // リクエストボディとしてフォームデータを送信
+            ).then(response => {
+                // レスポンスを処理する（必要に応じて）
+                console.log(response);
+            })
                 .catch(error => {
                     // エラーを処理する（必要に応じて）
                     console.error(error);
