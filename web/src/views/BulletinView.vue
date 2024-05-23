@@ -6,7 +6,7 @@
                 <!-- 題名 -->
                 <div class="d-flex align-items-center">
                     <p class="mb-0 mr-2">題名</p>
-                    <input id="inline-form-input-name" type="text" placeholder="題名を入力して下さい"
+                    <input id="inline-form-input-name" v-model="title" type="text" placeholder="題名を入力して下さい"
                         class="mr-sm-2 form-control">
                 </div>
                 <!-- 日付 -->
@@ -131,9 +131,9 @@ export default {
             context: null,
             fields: ['title', 'contents', 'date', 'delete', 'edit'],
             items: [
-                { date: '2024/01/02', title: 'Dickerson', contents: 'Macdonald' },
-                { date: 21, title: 'Larsen', contents: 'Shaw' },
-                { date: 89, title: 'Geneva', contents: 'Wilson' }
+                // { date: '2024/01/02', title: 'Dickerson', contents: 'Macdonald' },
+                // { date: 21, title: 'Larsen', contents: 'Shaw' },
+                // { date: 89, title: 'Geneva', contents: 'Wilson' }
             ],
             isBusy: false, // isBusyプロパティを追加してリアクティブなデータとして定義
             totalCount: 0,
@@ -145,6 +145,7 @@ export default {
             },
             url: null,
             uploadFile: '',
+            title: '',
             result: []
         }
     },
@@ -171,24 +172,34 @@ export default {
         search() {
             // 入力した値を格納する
             this.form = {
-                title: this.text,  // 例: 題名を入力フィールドから取得
+                title: this.title,
                 startDate: this.day2,
                 endDate: this.day1
             };
+            console.log(this.form);
 
             // バリデーションチェックのメソッドを呼び出す
             this.formCheck();
 
-            axios.post(
-                'http://localhost:8080/bulletin',
-                this.form  // リクエストボディとしてフォームデータを送信
-            ).then(response => {
-                // レスポンスを処理する（必要に応じて）
-                console.log(response);
-            })
+            this.isBusy = true; // データ取得中にロード中の状態を設定
+            axios.post('http://localhost:8080/bulletin', this.form)
+                .then(response => {
+                    // レスポンスデータをitemsに格納
+                    this.items = response.data.map(item => {
+                        return {
+                            date: item.date, // レスポンスのdateフィールドに合わせて変更
+                            title: item.title,
+                            contents: item.contents
+                        };
+                    });
+                    console.log(response);
+                })
                 .catch(error => {
                     // エラーを処理する（必要に応じて）
                     console.error(error);
+                })
+                .finally(() => {
+                    this.isBusy = false; // データ取得完了後にロード中の状態を解除
                 });
         },
         registerArticle() {
