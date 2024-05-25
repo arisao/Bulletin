@@ -10,7 +10,7 @@ import com.bulletin.entity.Bulletin;
 @Mapper
 public interface BulletinMapper {
 	List<Bulletin> search(BulletinSearchRequest bulletin);
-	void insert(Bulletin bulletin);
+	void insert(BulletinSearchRequest bulletinSearchRequest);
 	
 
 }

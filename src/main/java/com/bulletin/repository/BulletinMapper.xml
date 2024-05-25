@@ -3,11 +3,25 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bulletin.repository.BulletinMapper">
-    <select id="search" resultType="com.bulletin.entity.Bulletin">
-        SELECT title, contents FROM info where active_yn = 'Y';
+    <select id="search" parameterType="com.bulletin.entity.Bulletin">
+        SELECT 
+        title,
+        contents,
+        create_date
+        FROM
+        info
+        <where>
+        active_yn = 'Y'
+        <if test='title != null and title !=""'>
+        AND title LIKE CONCAT('%',#{title}, '%')
+        </if>
+        <if test='startDate != null and startDate != "" and endDate != null and endDate != ""'>
+        AND update_date BETWEEN #{startDate} AND #{endDate}
+        </if>
+        </where> 
     </select>
     
-    <insert id="regist" parameterType="com.bulletin.entity.Bulletin">
+    <insert id="insert" parameterType="com.bulletin.entity.Bulletin">
     INSERT INTO info (seq, title, contents)
     VALUES (#(seq), #(title), #(contents))
     </insert>

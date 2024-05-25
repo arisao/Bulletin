@@ -77,10 +77,10 @@
         <!-- 新規登録モーダル -->
         <b-modal ref="my-modal" size="xl" hide-footer title="新規記事登録">
             <p>題名</p>
-            <b-form-input id="inline-form-input-name" class="mb-2 mr-sm-2 mb-sm-0"
+            <b-form-input id="inline-form-input-name" v-model="newTitle" class="mb-2 mr-sm-2 mb-sm-0"
                 placeholder="題名を入力して下さい"></b-form-input>
             <p>内容</p>
-            <b-form-input id="inline-form-input-name" class="mb-2 mr-sm-2 mb-sm-0"
+            <b-form-input id="inline-form-input-name" v-model="newContents" class="mb-2 mr-sm-2 mb-sm-0"
                 placeholder="記事を入力して下さい"></b-form-input>
             <!-- ファイルインプット -->
             <!-- <b-form-group label="写真アップロード" label-cols-sm="2"> -->
@@ -129,12 +129,8 @@ export default {
             day1: today.toISOString().slice(0, 10),
             day2: yesterday.toISOString().slice(0, 10),
             context: null,
-            fields: ['title', 'contents', 'date', 'delete', 'edit'],
-            items: [
-                // { date: '2024/01/02', title: 'Dickerson', contents: 'Macdonald' },
-                // { date: 21, title: 'Larsen', contents: 'Shaw' },
-                // { date: 89, title: 'Geneva', contents: 'Wilson' }
-            ],
+            fields: ['title', 'contents', 'create_date', 'delete', 'edit'],
+            items: [],
             isBusy: false, // isBusyプロパティを追加してリアクティブなデータとして定義
             totalCount: 0,
             rows: 100,
@@ -142,11 +138,14 @@ export default {
             errorMessage: '',
             form: {
                 image: null,
+                newTitle: ''
             },
             url: null,
             uploadFile: '',
             title: '',
-            result: []
+            result: [],
+            newTitle: '',
+            newContents: ''
         }
     },
     //インスタンスが生成された後で実行される
@@ -187,7 +186,7 @@ export default {
                     // レスポンスデータをitemsに格納
                     this.items = response.data.map(item => {
                         return {
-                            date: item.date, // レスポンスのdateフィールドに合わせて変更
+                            create_date: item.create_date, // レスポンスのdateフィールドに合わせて変更
                             title: item.title,
                             contents: item.contents
                         };
@@ -232,10 +231,12 @@ export default {
             this.$refs['my-modal'].hide()
         },
         submit(event) {
+            confirm("登録しますか？")
+            //入力した値を格納する
             event.preventDefault()
             const formData = new FormData()
             formData.append('image', this.form.image)
-            axios.post('/api/form/upload', formData)
+            axios.post('http://localhost:8080/upload', formData)
                 .then((res) => {
                     console.log(res)
                     // アップロード処理

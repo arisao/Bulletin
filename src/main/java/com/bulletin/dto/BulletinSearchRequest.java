@@ -1,6 +1,7 @@
 package com.bulletin.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import lombok.Data;
 
@@ -11,7 +12,8 @@ public class BulletinSearchRequest{
 	private int seq;
 	private String title;
 	private String contents;
-	private String create_date;
+	private String startDate;
+	private String endDate;
 	private String update_date;
 	
 

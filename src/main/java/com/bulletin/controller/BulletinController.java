@@ -37,6 +37,7 @@ public class BulletinController {
 	public String home() {
 		return "test...";
 	}
+
 	
 	/*
 	 *  掲示板検索機能
@@ -45,7 +46,8 @@ public class BulletinController {
 	 */
 	@PostMapping(value = "/bulletin")
 	public List<Bulletin> search(@RequestBody BulletinSearchRequest bulletinSearchRequest) {
-	    return bulletinService.search(bulletinSearchRequest);
+		var result = bulletinService.search(bulletinSearchRequest);
+	    return result;
 	}
 
 }
