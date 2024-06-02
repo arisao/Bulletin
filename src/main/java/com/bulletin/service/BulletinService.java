@@ -18,5 +18,13 @@ public class BulletinService {
 	public List<Bulletin> search(BulletinSearchRequest bulletinSearchRequest){
 		return bulletinMapper.search(bulletinSearchRequest);
 	};
+	
+	public int searchCount(BulletinSearchRequest bulletinSearchRequest){
+		return bulletinMapper.searchCount(bulletinSearchRequest);
+	};
+	
 
+	public int insert(BulletinSearchRequest bulletinSearchRequest){
+		return bulletinMapper.insert(bulletinSearchRequest);
+	};
 }

@@ -4,7 +4,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bulletin.repository.BulletinMapper">
     <select id="search" parameterType="com.bulletin.entity.Bulletin">
-        SELECT 
+        SELECT
+        seq, 
         title,
         contents,
         create_date
@@ -21,8 +22,23 @@
         </where> 
     </select>
     
+       <select id="searchCount" parameterType="com.bulletin.entity.Bulletin" resultType="int">
+    SELECT COUNT(*) AS total_rows
+     FROM info
+     <where>
+     active_yn = 'Y'
+     <if test='title != null and title !=""'>
+     AND title LIKE CONCAT('%',#{title}, '%')
+     </if>
+     <if test='startDate != null and startDate != "" and endDate != null and endDate != ""'>
+    AND update_date BETWEEN #{startDate} AND #{endDate}
+    </if>
+    </where>
+    </select>
+    
     <insert id="insert" parameterType="com.bulletin.entity.Bulletin">
-    INSERT INTO info (seq, title, contents)
-    VALUES (#(seq), #(title), #(contents))
+    INSERT INTO info (seq, title, contents, active_yn)
+    VALUES (#(seq), #(title), #(contents), "y")
     </insert>
+    
 </mapper>

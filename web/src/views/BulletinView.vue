@@ -34,7 +34,8 @@
         <!-- sticky-header : 스크롤로 테이블의 크기를 한정짓고 싶을 때 사용 ( 필자는 docs에서 해당옵션을 못보고 지나가 css로 삽질을 했음 ) -->
         <!-- busy : 로딩바로 사용 -->
         <div class="mt-3">
-            <b-table :sticky-header="true" :items="items" :fields="fields" :busy="isBusy">
+            <b-table :sticky-header="true" :items="items" :fields="fields" :busy="isBusy" :per-page="perPage"
+                :current-page="currentPage">
                 <template #cell(edit)="row">
                     <b-button v-b-modal.modal-xl variant="primary" size="sm" @click="editItem(row.item)">修正</b-button>
                 </template>
@@ -48,6 +49,7 @@
             <p>題名</p>
             <b-form-input id="inline-form-input-name" class="mb-2 mr-sm-2 mb-sm-0"
                 placeholder="題名を入力して下さい"></b-form-input>
+            </b-form-invalid-feedback>
             <p>内容</p>
             <b-form-input id="inline-form-input-name" class="mb-2 mr-sm-2 mb-sm-0"
                 placeholder="記事を入力して下さい"></b-form-input>
@@ -77,11 +79,16 @@
         <!-- 新規登録モーダル -->
         <b-modal ref="my-modal" size="xl" hide-footer title="新規記事登録">
             <p>題名</p>
-            <b-form-input id="inline-form-input-name" v-model="newTitle" class="mb-2 mr-sm-2 mb-sm-0"
-                placeholder="題名を入力して下さい"></b-form-input>
-            <p>内容</p>
-            <b-form-input id="inline-form-input-name" v-model="newContents" class="mb-2 mr-sm-2 mb-sm-0"
-                placeholder="記事を入力して下さい"></b-form-input>
+            <b-form-input id="inline-form-input-name" v-model="newTitle" :state="validation"
+                class="mb-2 mr-sm-2 mb-sm-0" placeholder="題名を入力して下さい"></b-form-input>
+            <b-form-invalid-feedback :state="validation">
+                題名は1-50文字以内で入力して下さい
+            </b-form-invalid-feedback>
+            <b-form-group label="記事" label-for="inline-form-input-article" :state="!isInvalid"
+                invalid-feedback="記事は1-1000文字で入力して下さい">
+                <b-form-textarea id="inline-form-input-article" v-model="newContents" placeholder="記事を入力して下さい" rows="3"
+                    :state="!isInvalid" @input="validate"></b-form-textarea>
+            </b-form-group>
             <!-- ファイルインプット -->
             <!-- <b-form-group label="写真アップロード" label-cols-sm="2"> -->
             <p>写真アップロード</p>
@@ -125,6 +132,8 @@ export default {
         yesterday.setDate(today.getDate() - 1);
 
         return {
+            perPage: 10,
+            currentPage: 1,
             text: '',
             day1: today.toISOString().slice(0, 10),
             day2: yesterday.toISOString().slice(0, 10),
@@ -136,24 +145,31 @@ export default {
             rows: 100,
             currentPage: 1,
             errorMessage: '',
-            form: {
-                image: null,
-                newTitle: ''
-            },
             url: null,
-            uploadFile: '',
             title: '',
             result: [],
             newTitle: '',
-            newContents: ''
+            newContents: '',
+            image: '',
+            isInvalid: true
         }
     },
     //インスタンスが生成された後で実行される
     created() {
         console.log("....")
     },
-
+    computed: {
+        validation() {
+            return this.newTitle != "" && this.newTitle.length < 51
+        },
+        rows() {
+            return this.items.length
+        }
+    },
     methods: {
+        validate() {
+            this.isInvalid = this.newContents.length < 0 || this.newContents.length > 1000;
+        },
         onContext({ detail }) {
             this.context = JSON.stringify(detail, null, 2);
         },
@@ -183,8 +199,12 @@ export default {
             this.isBusy = true; // データ取得中にロード中の状態を設定
             axios.post('http://localhost:8080/bulletin', this.form)
                 .then(response => {
+
+                    // 検索結果の件数をtotalCountに格納
+                    this.totalCount = response.data.totalCount;
+
                     // レスポンスデータをitemsに格納
-                    this.items = response.data.map(item => {
+                    this.items = response.data.response.map(item => {
                         return {
                             create_date: item.create_date, // レスポンスのdateフィールドに合わせて変更
                             title: item.title,
@@ -232,22 +252,32 @@ export default {
         },
         submit(event) {
             confirm("登録しますか？")
-            //入力した値を格納する
-            event.preventDefault()
-            const formData = new FormData()
-            formData.append('image', this.form.image)
+            // 입력한 값을 form에 저장
+            this.form = {
+                newTitle: this.newTitle,
+                newContents: this.newContents,
+                image: this.image // this.image가 실제로 정의되어 있는지 확인하세요.
+            };
+            validate();
+            event.preventDefault();
+
+            const formData = new FormData();
+            formData.append('image', this.form.image);
+            formData.append('newTitle', this.form.newTitle); // 추가
+            formData.append('newContents', this.form.newContents); // 추가
+
             axios.post('http://localhost:8080/upload', formData)
                 .then((res) => {
-                    console.log(res)
+                    console.log(res);
                     // アップロード処理
-                    this.uploadedFile = res.data.filename
+                    // this.uploadedFile = res.data.filename
                 })
                 .catch((err) => {
-                    console.log(err)
+                    console.log(err);
                     // エラー処理
-                })
-
+                });
         },
+
         edit(event) {
             confirm('修正しますか？');
             event.preventDefault()
