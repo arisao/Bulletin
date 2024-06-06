@@ -27,4 +27,8 @@ public class BulletinService {
 	public int insert(BulletinSearchRequest bulletinSearchRequest){
 		return bulletinMapper.insert(bulletinSearchRequest);
 	};
+	
+	public void delete(String seq, Bulletin bulletin){
+		bulletinMapper.deleteArticle(seq, bulletin);
+	};
 }

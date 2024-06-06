@@ -78,12 +78,13 @@
 
         <!-- 新規登録モーダル -->
         <b-modal ref="my-modal" size="xl" hide-footer title="新規記事登録">
-            <p>題名</p>
-            <b-form-input id="inline-form-input-name" v-model="newTitle" :state="validation"
-                class="mb-2 mr-sm-2 mb-sm-0" placeholder="題名を入力して下さい"></b-form-input>
-            <b-form-invalid-feedback :state="validation">
-                題名は1-50文字以内で入力して下さい
-            </b-form-invalid-feedback>
+            <b-form-group label="題名" label-for="inline-form-input-name">
+                <b-form-input id="inline-form-input-name" v-model="newTitle" :state="validation"
+                    class="mb-2 mr-sm-2 mb-sm-0" placeholder="題名を入力して下さい"></b-form-input>
+                <b-form-invalid-feedback :state="validation">
+                    題名は1-50文字以内で入力して下さい
+                </b-form-invalid-feedback>
+            </b-form-group>
             <b-form-group label="記事" label-for="inline-form-input-article" :state="!isInvalid"
                 invalid-feedback="記事は1-1000文字で入力して下さい">
                 <b-form-textarea id="inline-form-input-article" v-model="newContents" placeholder="記事を入力して下さい" rows="3"
@@ -117,7 +118,9 @@
         <!-- ページネーション -->
         <div class="mt-3">
             <h6 class="text-center"></h6>
-            <b-pagination v-model="currentPage" :total-rows="rows" align="center"></b-pagination>
+            <b-pagination v-model="currentPage" :total-rows="totalCount" :per-page="perPage" align="center"
+                @change="pageChanged"></b-pagination>
+
         </div>
     </div>
 </template>
@@ -132,7 +135,9 @@ export default {
         yesterday.setDate(today.getDate() - 1);
 
         return {
+            //一ページの最大表示数
             perPage: 10,
+            //現在のページ
             currentPage: 1,
             text: '',
             day1: today.toISOString().slice(0, 10),
@@ -142,8 +147,6 @@ export default {
             items: [],
             isBusy: false, // isBusyプロパティを追加してリアクティブなデータとして定義
             totalCount: 0,
-            rows: 100,
-            currentPage: 1,
             errorMessage: '',
             url: null,
             title: '',
@@ -151,7 +154,10 @@ export default {
             newTitle: '',
             newContents: '',
             image: '',
-            isInvalid: true
+            isInvalid: true,
+            offset: '0',
+            seq: null,
+            form: {}
         }
     },
     //インスタンスが生成された後で実行される
@@ -184,50 +190,26 @@ export default {
                 this.errorMessage = ''; // エラーメッセージをクリア
             }
         },
-        search() {
-            // 入力した値を格納する
-            this.form = {
-                title: this.title,
-                startDate: this.day2,
-                endDate: this.day1
-            };
-            console.log(this.form);
 
-            // バリデーションチェックのメソッドを呼び出す
-            this.formCheck();
-
-            this.isBusy = true; // データ取得中にロード中の状態を設定
-            axios.post('http://localhost:8080/bulletin', this.form)
-                .then(response => {
-
-                    // 検索結果の件数をtotalCountに格納
-                    this.totalCount = response.data.totalCount;
-
-                    // レスポンスデータをitemsに格納
-                    this.items = response.data.response.map(item => {
-                        return {
-                            create_date: item.create_date, // レスポンスのdateフィールドに合わせて変更
-                            title: item.title,
-                            contents: item.contents
-                        };
-                    });
-                    console.log(response);
-                })
-                .catch(error => {
-                    // エラーを処理する（必要に応じて）
-                    console.error(error);
-                })
-                .finally(() => {
-                    this.isBusy = false; // データ取得完了後にロード中の状態を解除
-                });
-        },
         registerArticle() {
             this.$refs['my-modal'].show()
         },
         deleteItem(item) {
-            alert('本当に削除しますか')
-            confirm('記事を削除しました')
-            // 削除のロジックをここに追加
+            confirm('本当に削除しますか')
+            console.log(item);
+            this.form = {
+                seq: item.seq
+            };
+            axios.put('http://localhost:8080/delete/' + item.seq, this.form)
+                .then((res) => {
+                    console.log(res);
+                    alert('記事を削除しました');
+                    this.search();
+                })
+                .catch((err) => {
+                    console.log(err);
+                    // エラー処理
+                });
             console.log("Delete item:", item);
         },
         editItem(item) {
@@ -250,13 +232,58 @@ export default {
             this.url = null
             this.$refs['my-modal'].hide()
         },
+        search() {
+            // 入力した値を格納する
+            this.form = {
+                title: this.title,
+                startDate: this.day2,
+                endDate: this.day1,
+                limit: this.perPage,
+                //現在のページ番号　*　一ページあたりに表示する件数
+                offset: (this.currentPage - 1) * this.perPage
+            };
+            console.log(this.form);
+
+            // バリデーションチェックのメソッドを呼び出す
+            this.formCheck();
+
+            this.isBusy = true; // データ取得中にロード中の状態を設定
+            axios.post('http://localhost:8080/bulletin', this.form)
+                .then(response => {
+
+                    // 検索結果の件数をtotalCountに格納
+                    this.totalCount = response.data.totalCount;
+
+                    // レスポンスデータをitemsに格納
+                    this.items = response.data.response.map(item => {
+                        return {
+                            seq: item.seq,
+                            create_date: item.create_date, // レスポンスのdateフィールドに合わせて変更
+                            title: item.title,
+                            contents: item.contents
+                        };
+                    });
+                    console.log(response);
+                })
+                .catch(error => {
+                    // エラーを処理する（必要に応じて）
+                    console.error(error);
+                })
+                .finally(() => {
+                    this.isBusy = false; // データ取得完了後にロード中の状態を解除
+                });
+        },
+        //現在のページを決める
+        pageChanged(offset) {
+            this.currentPage = offset;
+            this.search(); // ページ変更時に再検索
+        },
         submit(event) {
             confirm("登録しますか？")
-            // 입력한 값을 form에 저장
             this.form = {
                 newTitle: this.newTitle,
                 newContents: this.newContents,
-                image: this.image // this.image가 실제로 정의되어 있는지 확인하세요.
+                image: this.image
             };
             validate();
             event.preventDefault();
@@ -277,7 +304,6 @@ export default {
                     // エラー処理
                 });
         },
-
         edit(event) {
             confirm('修正しますか？');
             event.preventDefault()
@@ -293,7 +319,6 @@ export default {
                     console.log(err)
                     // エラー処理
                 })
-
         },
         hideEditModal() {
             this.form.image = null

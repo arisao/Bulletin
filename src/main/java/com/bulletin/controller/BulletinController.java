@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -80,4 +81,13 @@ public class BulletinController {
         return "/bulletin";
     }
 
+	/*
+	 *  記事削除
+	 *  @param bulletinSearchRequest
+	 *  @return 掲示板一覧画面
+	 */
+	@PutMapping(value = "/delete/{seq}")
+	public void delete(@PathVariable String seq, @RequestBody Bulletin bulletin) {
+		bulletinService.delete(seq, bulletin);
+	}
 }

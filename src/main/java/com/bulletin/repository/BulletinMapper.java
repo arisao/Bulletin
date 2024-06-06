@@ -12,6 +12,6 @@ public interface BulletinMapper {
 	List<Bulletin> search(BulletinSearchRequest bulletin);
 	int searchCount(BulletinSearchRequest bulletin);
     int insert(BulletinSearchRequest bulletinSearchRequest);
-	
+	void deleteArticle(String seq, Bulletin bulletin);
 
 }

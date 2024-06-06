@@ -18,7 +18,8 @@ public class BulletinSearchRequest{
 	private String newTitle;
     private String newContents;
     private String image;
-	
+	private int offset;
+	private int limit;
 	
 
 }

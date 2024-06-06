@@ -19,26 +19,35 @@
         <if test='startDate != null and startDate != "" and endDate != null and endDate != ""'>
         AND update_date BETWEEN #{startDate} AND #{endDate}
         </if>
-        </where> 
+        </where>
+        ORDER BY create_date ASC
+        Limit #{limit}
+        OFFSET #{offset}
     </select>
     
-       <select id="searchCount" parameterType="com.bulletin.entity.Bulletin" resultType="int">
-    SELECT COUNT(*) AS total_rows
-     FROM info
-     <where>
-     active_yn = 'Y'
-     <if test='title != null and title !=""'>
-     AND title LIKE CONCAT('%',#{title}, '%')
-     </if>
-     <if test='startDate != null and startDate != "" and endDate != null and endDate != ""'>
-    AND update_date BETWEEN #{startDate} AND #{endDate}
-    </if>
-    </where>
+    <select id="searchCount" parameterType="com.bulletin.entity.Bulletin" resultType="int">
+	    SELECT COUNT(*) AS total_rows
+	     FROM info
+	     <where>
+	     active_yn = 'Y'
+	     <if test='title != null and title !=""'>
+	     AND title LIKE CONCAT('%',#{title}, '%')
+	     </if>
+	     <if test='startDate != null and startDate != "" and endDate != null and endDate != ""'>
+	    AND update_date BETWEEN #{startDate} AND #{endDate}
+	    </if>
+	    </where>
     </select>
     
     <insert id="insert" parameterType="com.bulletin.entity.Bulletin">
-    INSERT INTO info (seq, title, contents, active_yn)
-    VALUES (#(seq), #(title), #(contents), "y")
+		INSERT INTO info (seq, title, contents, active_yn)
+		VALUES (#(seq), #(title), #(contents), "y")
     </insert>
+    
+   <update id="deleteArticle" parameterType="com.bulletin.entity.Bulletin">
+		update info
+		set active_yn = 'N'
+		where seq = ${seq}
+    </update>
     
 </mapper>
