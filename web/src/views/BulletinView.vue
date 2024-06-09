@@ -47,12 +47,10 @@
         <!-- 修正モーダル -->
         <b-modal ref="edit-modal" size="xl" hide-footer title="記事修正">
             <p>題名</p>
-            <b-form-input id="inline-form-input-name" class="mb-2 mr-sm-2 mb-sm-0"
-                placeholder="題名を入力して下さい"></b-form-input>
+            <b-form-input id="inline-form-input-name" v-model="title" class="mb-2 mr-sm-2 mb-sm-0"></b-form-input>
             </b-form-invalid-feedback>
             <p>内容</p>
-            <b-form-input id="inline-form-input-name" class="mb-2 mr-sm-2 mb-sm-0"
-                placeholder="記事を入力して下さい"></b-form-input>
+            <b-form-input id="inline-form-input-name" v-model="contents" class="mb-2 mr-sm-2 mb-sm-0"></b-form-input>
             <!-- ファイルインプット -->
             <!-- <b-form-group label="写真アップロード" label-cols-sm="2"> -->
             <p>写真アップロード</p>
@@ -195,27 +193,31 @@ export default {
             this.$refs['my-modal'].show()
         },
         deleteItem(item) {
-            confirm('本当に削除しますか')
-            console.log(item);
-            this.form = {
-                seq: item.seq
-            };
-            axios.put('http://localhost:8080/delete/' + item.seq, this.form)
-                .then((res) => {
-                    console.log(res);
-                    alert('記事を削除しました');
-                    this.search();
-                })
-                .catch((err) => {
-                    console.log(err);
-                    // エラー処理
-                });
-            console.log("Delete item:", item);
+            if (confirm('本当に削除しますか')) {
+                console.log(item);
+                this.form = {
+                    seq: item.seq
+                };
+                axios.put('http://localhost:8080/delete/' + item.seq, this.form)
+                    .then((res) => {
+                        console.log(res);
+                        alert('記事を削除しました');
+                        this.search();
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        // エラー処理
+                    });
+                console.log("Delete item:", item);
+            }
+
         },
         editItem(item) {
             // 修正のロジックをここに追加
             console.log("Edit item:", item);
+            this.getAriticle(item);
             this.$refs['edit-modal'].show();
+
         },
         // 画像のプレビューを表示するメソッド
         preview(event) {
@@ -237,10 +239,10 @@ export default {
             this.form = {
                 title: this.title,
                 startDate: this.day2,
-                endDate: this.day1,
-                limit: this.perPage,
-                //現在のページ番号　*　一ページあたりに表示する件数
-                offset: (this.currentPage - 1) * this.perPage
+                endDate: this.day1
+                // limit: this.perPage,
+                // //現在のページ番号　*　一ページあたりに表示する件数
+                // offset: (this.currentPage - 1) * this.perPage
             };
             console.log(this.form);
 
@@ -304,6 +306,18 @@ export default {
                     // エラー処理
                 });
         },
+        getAriticle(item) {
+            axios.get(`http://localhost:8080/detail/${item.seq}`)
+                .then((res) => {
+                    console.log(res);
+                    this.title = res.data.title;
+                    this.contents = res.data.contents;
+                })
+                .catch((err) => {
+                    console.log(err);
+                    // エラー処理
+                });
+        },
         edit(event) {
             confirm('修正しますか？');
             event.preventDefault()
@@ -324,7 +338,7 @@ export default {
             this.form.image = null
             this.url = null
             this.$refs['edit-modal'].hide()
-        },
+        }
     }
 }
 </script>

@@ -45,11 +45,10 @@ public class BulletinController {
 		return "test...";
 	}
 
-	
 	/*
-	 *  掲示板検索機能
+	 *  検索
 	 *  @param bulletinSearchRequest
-	 *  @return 掲示板一覧画面
+	 *  @return 検索結果一覧
 	 */
 	@PostMapping(value = "/bulletin")
 	public Map<String, Object> search(@RequestBody BulletinSearchRequest bulletinSearchRequest) {
@@ -60,7 +59,17 @@ public class BulletinController {
 		result.put("totalCount", totalCount);
 	    return result;
 	}
-
+	
+	/*
+	 *  記事詳細照会
+	 *  @param seq
+	 *  @return 記事詳細
+	 */
+	@GetMapping(value = "/detail/{seq}")
+	public Map<String, Object> getArticle(@PathVariable("seq") String seq) {
+		return bulletinService.getArticle(seq);
+	}
+	
 	/*
 	 *  掲示板登録機能
 	 *  @param 

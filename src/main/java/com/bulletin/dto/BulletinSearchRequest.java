@@ -14,7 +14,6 @@ public class BulletinSearchRequest{
 	private String contents;
 	private String startDate;
 	private String endDate;
-	private String update_date;
 	private String newTitle;
     private String newContents;
     private String image;

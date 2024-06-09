@@ -21,8 +21,22 @@
         </if>
         </where>
         ORDER BY create_date ASC
-        Limit #{limit}
-        OFFSET #{offset}
+    </select>
+    
+       <select id="getArticle" parameterType="com.bulletin.entity.Bulletin">
+        SELECT
+        seq, 
+        title,
+        contents,
+        create_date,
+        file_name
+        FROM
+        info
+        <where>
+        active_yn = 'Y'
+        AND
+        seq = #{seq}
+        </where>
     </select>
     
     <select id="searchCount" parameterType="com.bulletin.entity.Bulletin" resultType="int">
