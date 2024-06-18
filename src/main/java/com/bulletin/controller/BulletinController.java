@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.bulletin.dto.BulletinSearchRequest;
 import com.bulletin.entity.Bulletin;
+import com.bulletin.entity.bulletinEdit;
 import com.bulletin.service.BulletinService;
 
 import lombok.extern.java.Log;
@@ -77,19 +78,29 @@ public class BulletinController {
 	 */
 	@PostMapping(value = "/upload", consumes = "multipart/form-data")
     public String insert(
-            @RequestPart("image") MultipartFile image,
-            @RequestPart("newTitle") String newTitle,
-            @RequestPart("newContents") String newContents) {
+            @RequestParam("image") MultipartFile image,
+            @RequestParam("newTitle") String newTitle,
+            @RequestParam("newContents") String newContents) {
 
         BulletinSearchRequest bulletinSearchRequest = new BulletinSearchRequest();
-        bulletinSearchRequest.setNewTitle(newTitle);
-        bulletinSearchRequest.setNewContents(newContents);
+        bulletinSearchRequest.setTitle(newTitle);
+        bulletinSearchRequest.setContents(newContents);
         // Handle the file as needed, e.g., save it to a location or process it
 
         bulletinService.insert(bulletinSearchRequest);
         return "/bulletin";
     }
 
+	/*
+	 *  記事修正
+	 *  @param bulletinSearchRequest
+	 *  @return 掲示板一覧画面
+	 */
+	@PutMapping(value = "/edit/{seq}")
+	public bulletinEdit edit(@RequestBody bulletinEdit bulletin, @PathVariable String seq) {
+		return bulletinService.editArticle(seq, bulletin);
+	}
+	
 	/*
 	 *  記事削除
 	 *  @param bulletinSearchRequest

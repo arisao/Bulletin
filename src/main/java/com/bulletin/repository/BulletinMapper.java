@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.bulletin.dto.BulletinSearchRequest;
 import com.bulletin.entity.Bulletin;
+import com.bulletin.entity.bulletinEdit;
 
 @Mapper
 public interface BulletinMapper {
@@ -15,5 +17,5 @@ public interface BulletinMapper {
 	Map<String, Object>getArticle(String seq);	
     int insert(BulletinSearchRequest bulletinSearchRequest);
 	void deleteArticle(String seq, Bulletin bulletin);
-
+	int editArticle(@Param("seq") String seq, @Param("bulletin") bulletinEdit bulletin);
 }

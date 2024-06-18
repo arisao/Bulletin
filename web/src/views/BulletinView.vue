@@ -31,10 +31,10 @@
         <!-- 新規登録モーダル -->
         <b-modal id="modal-register" size="xl" title="記事タイトル">記事中身</b-modal>
 
-        <!-- sticky-header : 스크롤로 테이블의 크기를 한정짓고 싶을 때 사용 ( 필자는 docs에서 해당옵션을 못보고 지나가 css로 삽질을 했음 ) -->
+        <!-- sticky-header : スクロールさせたい時は、trueに変更する -->
         <!-- busy : 로딩바로 사용 -->
         <div class="mt-3">
-            <b-table :sticky-header="true" :items="items" :fields="fields" :busy="isBusy" :per-page="perPage"
+            <b-table :sticky-header="false" :items="items" :fields="fields" :busy="isBusy" :per-page="perPage"
                 :current-page="currentPage">
                 <template #cell(edit)="row">
                     <b-button v-b-modal.modal-xl variant="primary" size="sm" @click="editItem(row.item)">修正</b-button>
@@ -48,7 +48,6 @@
         <b-modal ref="edit-modal" size="xl" hide-footer title="記事修正">
             <p>題名</p>
             <b-form-input id="inline-form-input-name" v-model="title" class="mb-2 mr-sm-2 mb-sm-0"></b-form-input>
-            </b-form-invalid-feedback>
             <p>内容</p>
             <b-form-input id="inline-form-input-name" v-model="contents" class="mb-2 mr-sm-2 mb-sm-0"></b-form-input>
             <!-- ファイルインプット -->
@@ -148,14 +147,16 @@ export default {
             errorMessage: '',
             url: null,
             title: '',
-            result: [],
+            contents: '',
             newTitle: '',
             newContents: '',
+            result: [],
             image: '',
             isInvalid: true,
             offset: '0',
             seq: null,
-            form: {}
+            form: {},
+            currentItem: null
         }
     },
     //インスタンスが生成された後で実行される
@@ -212,8 +213,8 @@ export default {
             }
 
         },
+        //修正モーダルを開く
         editItem(item) {
-            // 修正のロジックをここに追加
             console.log("Edit item:", item);
             this.getAriticle(item);
             this.$refs['edit-modal'].show();
@@ -312,27 +313,32 @@ export default {
                     console.log(res);
                     this.title = res.data.title;
                     this.contents = res.data.contents;
+                    this.currentItem = item;
                 })
                 .catch((err) => {
                     console.log(err);
                     // エラー処理
                 });
         },
-        edit(event) {
-            confirm('修正しますか？');
-            event.preventDefault()
-            const formData = new FormData()
-            formData.append('image', this.form.image)
-            axios.post('/api/form/upload', formData)
-                .then((res) => {
-                    console.log(res)
-                    // アップロード処理
-                    this.uploadedFile = res.data.filename
-                })
-                .catch((err) => {
-                    console.log(err)
-                    // エラー処理
-                })
+        edit() {
+            if (confirm('修正しますか？')) {
+                this.form = {
+                    seq: this.currentItem.seq,
+                    title: this.title,
+                    contents: this.contents
+                };
+                console.log(this.form);
+                axios.put("http://localhost:8080/edit/" + this.currentItem.seq, this.form)
+                    .then((res) => {
+                        console.log(res);
+                        alert('記事を修正しました');
+                        this.$refs['edit-modal'].hide();
+                        search();
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            }
         },
         hideEditModal() {
             this.form.image = null

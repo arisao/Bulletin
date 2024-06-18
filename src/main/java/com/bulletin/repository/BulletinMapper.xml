@@ -58,6 +58,13 @@
 		VALUES (#(seq), #(title), #(contents), "y")
     </insert>
     
+ <update id="editArticle" parameterType="map">
+    UPDATE info
+    SET title = #{bulletin.title},
+        contents = #{bulletin.contents}
+    WHERE seq = #{seq}
+</update>
+    
    <update id="deleteArticle" parameterType="com.bulletin.entity.Bulletin">
 		update info
 		set active_yn = 'N'
