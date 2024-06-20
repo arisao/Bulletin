@@ -28,9 +28,6 @@
         <!-- 新規登録 -->
         <div class="mt-3 d-flex justify-content-end"><b-button class="register" @click="registerArticle">新規登録</b-button>
         </div>
-        <!-- 新規登録モーダル -->
-        <b-modal id="modal-register" size="xl" title="記事タイトル">記事中身</b-modal>
-
         <!-- sticky-header : スクロールさせたい時は、trueに変更する -->
         <!-- busy : 로딩바로 사용 -->
         <div class="mt-3">
@@ -46,10 +43,18 @@
         </div>
         <!-- 修正モーダル -->
         <b-modal ref="edit-modal" size="xl" hide-footer title="記事修正">
-            <p>題名</p>
-            <b-form-input id="inline-form-input-name" v-model="title" class="mb-2 mr-sm-2 mb-sm-0"></b-form-input>
-            <p>内容</p>
-            <b-form-input id="inline-form-input-name" v-model="contents" class="mb-2 mr-sm-2 mb-sm-0"></b-form-input>
+            <b-form-group label="題名" label-for="inline-form-input-name">
+                <b-form-input id="inline-form-input-name" v-model="title" :state="validation2"
+                    class="mb-2 mr-sm-2 mb-sm-0"></b-form-input>
+                <b-form-invalid-feedback :state="validation2">
+                    題名は1-50文字以内で入力して下さい
+                </b-form-invalid-feedback>
+            </b-form-group>
+            <b-form-group label="記事" label-for="inline-form-input-article" :state="!isInvalid"
+                invalid-feedback="記事は1-1000文字で入力して下さい">
+                <b-form-textarea id="inline-form-input-article" v-model="contents" placeholder="記事を入力して下さい" rows="3"
+                    :state="!isInvalid" @input="validate2"></b-form-textarea>
+            </b-form-group>
             <!-- ファイルインプット -->
             <!-- <b-form-group label="写真アップロード" label-cols-sm="2"> -->
             <p>写真アップロード</p>
@@ -147,6 +152,7 @@ export default {
             errorMessage: '',
             url: null,
             title: '',
+            searchTitle: '',
             contents: '',
             newTitle: '',
             newContents: '',
@@ -167,6 +173,9 @@ export default {
         validation() {
             return this.newTitle != "" && this.newTitle.length < 51
         },
+        validation2() {
+            return this.title != "" && this.title.length < 51
+        },
         rows() {
             return this.items.length
         }
@@ -174,6 +183,9 @@ export default {
     methods: {
         validate() {
             this.isInvalid = this.newContents.length < 0 || this.newContents.length > 1000;
+        },
+        validate2() {
+            this.isInvalid = this.contents.length < 0 || this.contents.length > 1000;
         },
         onContext({ detail }) {
             this.context = JSON.stringify(detail, null, 2);
