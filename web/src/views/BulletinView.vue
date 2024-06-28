@@ -6,7 +6,7 @@
                 <!-- 題名 -->
                 <div class="d-flex align-items-center">
                     <p class="mb-0 mr-2">題名</p>
-                    <input id="inline-form-input-name" v-model="title" type="text" placeholder="題名を入力して下さい"
+                    <input id="inline-form-input-name" v-model="searchTitle" type="text" placeholder="題名を入力して下さい"
                         class="mr-sm-2 form-control">
                 </div>
                 <!-- 日付 -->
@@ -29,7 +29,7 @@
         <div class="mt-3 d-flex justify-content-end"><b-button class="register" @click="registerArticle">新規登録</b-button>
         </div>
         <!-- sticky-header : スクロールさせたい時は、trueに変更する -->
-        <!-- busy : 로딩바로 사용 -->
+        <!-- busy : ローディングをすぐに使用する -->
         <div class="mt-3">
             <b-table :sticky-header="false" :items="items" :fields="fields" :busy="isBusy" :per-page="perPage"
                 :current-page="currentPage">
@@ -55,12 +55,8 @@
                 <b-form-textarea id="inline-form-input-article" v-model="contents" placeholder="記事を入力して下さい" rows="3"
                     :state="!isInvalid" @input="validate2"></b-form-textarea>
             </b-form-group>
-            <!-- ファイルインプット -->
-            <!-- <b-form-group label="写真アップロード" label-cols-sm="2"> -->
             <p>写真アップロード</p>
             <b-form-file accept="image/jpeg, image/png, image/gif" id="file-default" @change="preview"></b-form-file>
-            <!-- </b-form-group> -->
-
             <!-- ファイルプレビュー -->
             <div v-if="url" class="position-relative my-2">
                 <img :src="url" class="border p-2" style="max-width: 100%;">
@@ -93,10 +89,8 @@
                     :state="!isInvalid" @input="validate"></b-form-textarea>
             </b-form-group>
             <!-- ファイルインプット -->
-            <!-- <b-form-group label="写真アップロード" label-cols-sm="2"> -->
             <p>写真アップロード</p>
             <b-form-file accept="image/jpeg, image/png, image/gif" id="file-default" @change="preview"></b-form-file>
-            <!-- </b-form-group> -->
 
             <!-- ファイルプレビュー -->
             <div v-if="url" class="position-relative my-2">
@@ -156,13 +150,22 @@ export default {
             contents: '',
             newTitle: '',
             newContents: '',
+            articleForm: {
+                newTitle: '',
+                newContents: '',
+                image: null,
+            },
+            url: null,
             result: [],
             image: '',
             isInvalid: true,
             offset: '0',
             seq: null,
-            form: {},
-            currentItem: null
+            imgData: {
+                image: null,
+            },
+            currentItem: null,
+            uploadedFile: '',
         }
     },
     //インスタンスが生成された後で実行される
@@ -235,8 +238,11 @@ export default {
         // 画像のプレビューを表示するメソッド
         preview(event) {
             const files = event.target.files || event.dataTransfer.files
-            this.form.image = files[0]
-            this.url = URL.createObjectURL(this.form.image)
+            this.imgData.image = files[0]
+            console.log(this.imgData.image);
+            this.url = URL.createObjectURL(this.imgData.image)
+            //ファイrデータを追加
+            this.articleForm.image = this.imgData.image;
         },
         deleteImage() {
             this.form.image = null
@@ -250,7 +256,7 @@ export default {
         search() {
             // 入力した値を格納する
             this.form = {
-                title: this.title,
+                title: this.searchTitle,
                 startDate: this.day2,
                 endDate: this.day1
                 // limit: this.perPage,
@@ -294,30 +300,29 @@ export default {
             this.search(); // ページ変更時に再検索
         },
         submit(event) {
-            confirm("登録しますか？")
-            this.form = {
-                newTitle: this.newTitle,
-                newContents: this.newContents,
-                image: this.image
-            };
-            validate();
-            event.preventDefault();
+            if (confirm("登録しますか？")) {
+                this.articleForm.newTitle = this.newTitle;
+                this.articleForm.newContents = this.newContents;
+                event.preventDefault();
 
-            const formData = new FormData();
-            formData.append('image', this.form.image);
-            formData.append('newTitle', this.form.newTitle); // 추가
-            formData.append('newContents', this.form.newContents); // 추가
+                const formData = new FormData();
+                formData.append('image', this.articleForm.image);
+                formData.append('newTitle', this.articleForm.newTitle); // 추가
+                formData.append('newContents', this.articleForm.newContents); // 추가
 
-            axios.post('http://localhost:8080/upload', formData)
-                .then((res) => {
-                    console.log(res);
-                    // アップロード処理
-                    // this.uploadedFile = res.data.filename
+                axios.post('http://localhost:8080/upload', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
                 })
-                .catch((err) => {
-                    console.log(err);
-                    // エラー処理
-                });
+                    .then((res) => {
+                        console.log(res);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        // エラー処理
+                    });
+            }
         },
         getAriticle(item) {
             axios.get(`http://localhost:8080/detail/${item.seq}`)
@@ -353,8 +358,9 @@ export default {
             }
         },
         hideEditModal() {
-            this.form.image = null
+            this.imgData.image = null
             this.url = null
+            this.form = "";
             this.$refs['edit-modal'].hide()
         }
     }

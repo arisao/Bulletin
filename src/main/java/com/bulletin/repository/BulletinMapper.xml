@@ -23,7 +23,7 @@
         ORDER BY create_date ASC
     </select>
     
-       <select id="getArticle" parameterType="com.bulletin.entity.Bulletin">
+    <select id="getArticle" parameterType="com.bulletin.entity.Bulletin">
         SELECT
         seq, 
         title,
@@ -53,9 +53,9 @@
 	    </where>
     </select>
     
-    <insert id="insert" parameterType="com.bulletin.entity.Bulletin">
-		INSERT INTO info (seq, title, contents, active_yn)
-		VALUES (#(seq), #(title), #(contents), "y")
+    <insert id="insert" parameterType="com.bulletin.entity.Upload">
+		INSERT INTO info (title, contents, active_yn, image_path)
+		VALUES (#(title), #(contents), "y", #{imagePath})
     </insert>
     
  <update id="editArticle" parameterType="map">

@@ -1,5 +1,6 @@
 package com.bulletin.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,16 +80,15 @@ public class BulletinController {
 	@PostMapping(value = "/upload", consumes = "multipart/form-data")
     public String insert(
             @RequestParam("image") MultipartFile image,
-            @RequestParam("newTitle") String newTitle,
-            @RequestParam("newContents") String newContents) {
-
-        BulletinSearchRequest bulletinSearchRequest = new BulletinSearchRequest();
-        bulletinSearchRequest.setTitle(newTitle);
-        bulletinSearchRequest.setContents(newContents);
-        // Handle the file as needed, e.g., save it to a location or process it
-
-        bulletinService.insert(bulletinSearchRequest);
-        return "/bulletin";
+            @RequestParam("newTitle") String title,
+            @RequestParam("newContents") String contents) {
+		try {
+			bulletinService.insert(title, contents, image);
+            return "Upload successful";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Upload failed";
+        }
     }
 
 	/*
