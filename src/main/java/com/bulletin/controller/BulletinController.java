@@ -38,7 +38,7 @@ import lombok.extern.java.Log;
 public class BulletinController {
 	/*
 	 * 掲示板 Service
-	 */	
+	 */
 	@Autowired
 	BulletinService bulletinService;
 
@@ -48,9 +48,11 @@ public class BulletinController {
 	}
 
 	/*
-	 *  検索
-	 *  @param bulletinSearchRequest
-	 *  @return 検索結果一覧
+	 * 検索
+	 * 
+	 * @param bulletinSearchRequest
+	 * 
+	 * @return 検索結果一覧
 	 */
 	@PostMapping(value = "/bulletin")
 	public Map<String, Object> search(@RequestBody BulletinSearchRequest bulletinSearchRequest) {
@@ -59,52 +61,65 @@ public class BulletinController {
 		Map<String, Object> result = new HashMap<>();
 		result.put("response", response);
 		result.put("totalCount", totalCount);
-	    return result;
+		return result;
 	}
-	
+
 	/*
-	 *  記事詳細照会
-	 *  @param seq
-	 *  @return 記事詳細
+	 * 記事詳細照会
+	 * 
+	 * @param seq
+	 * 
+	 * @return 記事詳細
 	 */
 	@GetMapping(value = "/detail/{seq}")
 	public Map<String, Object> getArticle(@PathVariable("seq") String seq) {
 		return bulletinService.getArticle(seq);
 	}
-	
-	/*
-	 *  掲示板登録機能
-	 *  @param 
-	 *  @return 
-	 */
-	@PostMapping(value = "/upload", consumes = "multipart/form-data")
-    public String insert(
-            @RequestParam("image") MultipartFile image,
-            @RequestParam("newTitle") String title,
-            @RequestParam("newContents") String contents) {
-		try {
-			bulletinService.insert(title, contents, image);
-            return "Upload successful";
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "Upload failed";
-        }
-    }
 
 	/*
-	 *  記事修正
-	 *  @param bulletinSearchRequest
-	 *  @return 掲示板一覧画面
+	 * 掲示板登録機能
+	 * 
+	 * @param
+	 * 
+	 * @return
+	 */
+	@PostMapping(value = "/upload", consumes = "multipart/form-data")
+	public String insert(@RequestParam(name = "image", required = false) MultipartFile image,
+			@RequestParam("newTitle") String title, @RequestParam("newContents") String contents) {
+		try {
+			bulletinService.insert(title, contents, image);
+			return "Upload successful";
+		} catch (IOException e) {
+			e.printStackTrace();
+			return "Upload failed";
+		}
+	}
+
+	/*
+	 * 記事修正
+	 * 
+	 * @param bulletinSearchRequest
+	 * 
+	 * @return 掲示板一覧画面
 	 */
 	@PutMapping(value = "/edit/{seq}")
-	public bulletinEdit edit(@RequestBody bulletinEdit bulletin, @PathVariable String seq) {
-		return bulletinService.editArticle(seq, bulletin);
+	public String edit(@RequestParam(name = "image", required = false) MultipartFile image,
+			@RequestParam("title") String title, @RequestParam("contents") String contents, @PathVariable String seq) {
+		try {
+			bulletinService.editArticle(seq, title, contents, image);
+			return "Update successful";
+		} catch (IOException e) {
+			e.printStackTrace();
+			return "Updaate failed";
+		}
 	}
-	
+
 	/*
-	 *  記事削除
-	 *  @param bulletinSearchRequest
-	 *  @return 掲示板一覧画面
+	 * 記事削除
+	 * 
+	 * @param bulletinSearchRequest
+	 * 
+	 * @return 掲示板一覧画面
 	 */
 	@PutMapping(value = "/delete/{seq}")
 	public void delete(@PathVariable String seq, @RequestBody Bulletin bulletin) {

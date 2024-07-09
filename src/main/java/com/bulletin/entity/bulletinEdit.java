@@ -8,4 +8,6 @@ public class bulletinEdit {
 private int seq;
 private String title;
 private String contents;
+private String imagePath;
+private String create_date;
 }

@@ -14,9 +14,14 @@ import com.bulletin.entity.bulletinEdit;
 @Mapper
 public interface BulletinMapper {
 	List<Bulletin> search(BulletinSearchRequest bulletin);
+
 	int searchCount(BulletinSearchRequest bulletin);
-	Map<String, Object>getArticle(String seq);	
-    void insert(Upload upload);
+
+	Map<String, Object> getArticle(String seq);
+
+	void insert(Upload upload);
+
 	void deleteArticle(String seq, Bulletin bulletin);
+
 	int editArticle(@Param("seq") String seq, @Param("bulletin") bulletinEdit bulletin);
 }

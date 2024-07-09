@@ -58,15 +58,15 @@
             <p>写真アップロード</p>
             <b-form-file accept="image/jpeg, image/png, image/gif" id="file-default" @change="preview"></b-form-file>
             <!-- ファイルプレビュー -->
-            <div v-if="url" class="position-relative my-2">
+            <!-- <div v-if="url" class="position-relative my-2">
                 <img :src="url" class="border p-2" style="max-width: 100%;">
-                <!-- Cancel -->
                 <b-button type="button" variant="secondary border-light" class="position-absolute"
                     style="left: 0;top: 0;" @click="deleteImage">
                     削除
                 </b-button>
                 UploadedFile: {{ uploadedFile }}
-            </div>
+            </div> -->
+            <img v-if="image" :src="image" alt="Article Image" style="max-width: 100%;">
 
             <div class="d-flex justify-content-center">
                 <b-button class="mt-3 mr-2" variant="primary" @click="edit">修正</b-button>
@@ -164,6 +164,7 @@ export default {
             imgData: {
                 image: null,
             },
+            image: '',
             currentItem: null,
             uploadedFile: '',
         }
@@ -231,7 +232,7 @@ export default {
         //修正モーダルを開く
         editItem(item) {
             console.log("Edit item:", item);
-            this.getAriticle(item);
+            this.getArticle(item);
             this.$refs['edit-modal'].show();
 
         },
@@ -245,13 +246,15 @@ export default {
             this.articleForm.image = this.imgData.image;
         },
         deleteImage() {
-            this.form.image = null
+            this.articleForm.image = null
             this.url = null
         },
         hideModal() {
-            this.form.image = null
-            this.url = null
             this.$refs['my-modal'].hide()
+            this.newTitle = '';
+            this.newContents = '';
+            this.imgData.image = '';
+            this.articleForm = '';
         },
         search() {
             // 入力した値を格納する
@@ -317,6 +320,13 @@ export default {
                 })
                     .then((res) => {
                         console.log(res);
+                        alert("登録しました")
+                        this.$refs['my-modal'].hide();
+                        this.newTitle = '';
+                        this.newContents = '';
+                        this.imgData.image = '';
+                        this.articleForm = '';
+                        this.search();
                     })
                     .catch((err) => {
                         console.log(err);
@@ -324,13 +334,19 @@ export default {
                     });
             }
         },
-        getAriticle(item) {
+        getArticle(item) {
             axios.get(`http://localhost:8080/detail/${item.seq}`)
                 .then((res) => {
                     console.log(res);
                     this.title = res.data.title;
                     this.contents = res.data.contents;
                     this.currentItem = item;
+                    // 이미지 데이터가 있는 경우 처리
+                    if (res.data.image) {
+                        this.image = `data:image/jpeg;base64,${res.data.image}`;
+                    } else {
+                        this.image = ''; // 이미지가 없는 경우 처리
+                    }
                 })
                 .catch((err) => {
                     console.log(err);

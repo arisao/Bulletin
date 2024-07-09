@@ -3,72 +3,80 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bulletin.repository.BulletinMapper">
-    <select id="search" parameterType="com.bulletin.entity.Bulletin">
-        SELECT
-        seq, 
-        title,
-        contents,
-        create_date
-        FROM
-        info
-        <where>
-        active_yn = 'Y'
-        <if test='title != null and title !=""'>
-        AND title LIKE CONCAT('%',#{title}, '%')
-        </if>
-        <if test='startDate != null and startDate != "" and endDate != null and endDate != ""'>
-        AND update_date BETWEEN #{startDate} AND #{endDate}
-        </if>
-        </where>
-        ORDER BY create_date ASC
-    </select>
-    
-    <select id="getArticle" parameterType="com.bulletin.entity.Bulletin">
-        SELECT
-        seq, 
-        title,
-        contents,
-        create_date,
-        file_name
-        FROM
-        info
-        <where>
-        active_yn = 'Y'
-        AND
-        seq = #{seq}
-        </where>
-    </select>
-    
-    <select id="searchCount" parameterType="com.bulletin.entity.Bulletin" resultType="int">
-	    SELECT COUNT(*) AS total_rows
-	     FROM info
-	     <where>
-	     active_yn = 'Y'
-	     <if test='title != null and title !=""'>
-	     AND title LIKE CONCAT('%',#{title}, '%')
-	     </if>
-	     <if test='startDate != null and startDate != "" and endDate != null and endDate != ""'>
-	    AND update_date BETWEEN #{startDate} AND #{endDate}
-	    </if>
-	    </where>
-    </select>
-    
-    <insert id="insert" parameterType="com.bulletin.entity.Upload">
-		INSERT INTO info (title, contents, active_yn, image_path)
-		VALUES (#{title}, #{contents}, "y", #{imagePath})
-    </insert>
-    
- <update id="editArticle" parameterType="map">
-    UPDATE info
-    SET title = #{bulletin.title},
-        contents = #{bulletin.contents}
-    WHERE seq = #{seq}
-</update>
-    
-   <update id="deleteArticle" parameterType="com.bulletin.entity.Bulletin">
+	<select id="search" parameterType="com.bulletin.entity.Bulletin">
+		SELECT
+		seq,
+		title,
+		contents,
+		create_date
+		FROM
+		info
+		<where>
+			active_yn = 'Y'
+			<if test='title != null and title !=""'>
+				AND title LIKE CONCAT('%',#{title}, '%')
+			</if>
+			<if
+				test='startDate != null and startDate != "" and endDate != null and endDate != ""'>
+				AND create_date BETWEEN #{startDate} AND #{endDate}
+			</if>
+		</where>
+		ORDER BY create_date ASC
+	</select>
+
+	<select id="getArticle"
+		parameterType="com.bulletin.entity.Bulletin">
+		SELECT
+		seq,
+		title,
+		contents,
+		create_date,
+		image_path
+		FROM
+		info
+		<where>
+			active_yn = 'Y'
+			AND
+			seq = #{seq}
+		</where>
+	</select>
+
+	<select id="searchCount"
+		parameterType="com.bulletin.entity.Bulletin" resultType="int">
+		SELECT COUNT(*) AS total_rows
+		FROM info
+		<where>
+			active_yn = 'Y'
+			<if test='title != null and title !=""'>
+				AND title LIKE CONCAT('%',#{title}, '%')
+			</if>
+			<if
+				test='startDate != null and startDate != "" and endDate != null and endDate != ""'>
+				AND create_date BETWEEN #{startDate} AND #{endDate}
+			</if>
+		</where>
+	</select>
+
+	<insert id="insert" parameterType="com.bulletin.entity.Upload">
+		INSERT INTO info (title,
+		contents, active_yn, image_path, create_date)
+		VALUES (#{title},
+		#{contents}, "y", #{imagePath}, #{create_date})
+	</insert>
+
+	<update id="editArticle" parameterType="map">
+		UPDATE info
+		SET title =
+		#{bulletin.title},
+		contents = #{bulletin.contents}
+		WHERE seq = #{seq}
+	</update>
+
+	<update id="deleteArticle"
+		parameterType="com.bulletin.entity.Bulletin">
 		update info
 		set active_yn = 'N'
 		where seq = ${seq}
-    </update>
-    
+	</update>
+
 </mapper>
