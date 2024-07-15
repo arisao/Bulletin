@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <p>My Page</p>
+        <p>My page</p>
         <div>
             <b-form inline class="form-container">
                 <!-- 題名 -->
@@ -22,9 +22,6 @@
 
             <h6 class="totalCount">全{{ totalCount }}件</h6>
         </div>
-
-
-
         <!-- 新規登録 -->
         <div class="mt-3 d-flex justify-content-end"><b-button class="register" @click="registerArticle">新規登録</b-button>
         </div>
@@ -50,22 +47,25 @@
                     題名は1-50文字以内で入力して下さい
                 </b-form-invalid-feedback>
             </b-form-group>
-            <b-form-group label="記事" label-for="inline-form-input-article" :state="!isInvalid"
-                invalid-feedback="記事は1-1000文字で入力して下さい">
-                <b-form-textarea id="inline-form-input-article" v-model="contents" placeholder="記事を入力して下さい" rows="3"
-                    :state="!isInvalid" @input="validate2"></b-form-textarea>
+            <b-form-group label="記事" label-for="inline-form-input-article">
+                <b-form-input id="inline-form-input-article" v-model="contents" placeholder="記事を入力して下さい" rows="3"
+                    :state="validation3"></b-form-input>
+                <b-form-invalid-feedback :state="validation3">
+                    題名は1-50文字以内で入力して下さい
+                </b-form-invalid-feedback>
             </b-form-group>
             <p>写真アップロード</p>
             <b-form-file accept="image/jpeg, image/png, image/gif" id="file-default" @change="preview"></b-form-file>
             <!-- ファイルプレビュー -->
-            <!-- <div v-if="url" class="position-relative my-2">
+            <div v-if="url" class="position-relative my-2">
                 <img :src="url" class="border p-2" style="max-width: 100%;">
+                <!-- Cancel -->
                 <b-button type="button" variant="secondary border-light" class="position-absolute"
                     style="left: 0;top: 0;" @click="deleteImage">
                     削除
                 </b-button>
                 UploadedFile: {{ uploadedFile }}
-            </div> -->
+            </div>
             <img v-if="image" :src="image" alt="Article Image" style="max-width: 100%;">
 
             <div class="d-flex justify-content-center">
@@ -145,6 +145,7 @@ export default {
             totalCount: 0,
             errorMessage: '',
             url: null,
+            editUrl: null,
             title: '',
             searchTitle: '',
             contents: '',
@@ -155,10 +156,15 @@ export default {
                 newContents: '',
                 image: null,
             },
-            url: null,
+            editArticleForm: {
+                title: '',
+                contents: '',
+                image: null,
+            },
             result: [],
             image: '',
             isInvalid: true,
+            isInvalid2: true,
             offset: '0',
             seq: null,
             imgData: {
@@ -180,6 +186,9 @@ export default {
         validation2() {
             return this.title != "" && this.title.length < 51
         },
+        validation3() {
+            return this.contents != "" && this.contents.length < 1000
+        },
         rows() {
             return this.items.length
         }
@@ -187,9 +196,6 @@ export default {
     methods: {
         validate() {
             this.isInvalid = this.newContents.length < 0 || this.newContents.length > 1000;
-        },
-        validate2() {
-            this.isInvalid = this.contents.length < 0 || this.contents.length > 1000;
         },
         onContext({ detail }) {
             this.context = JSON.stringify(detail, null, 2);
@@ -340,6 +346,7 @@ export default {
                     console.log(res);
                     this.title = res.data.title;
                     this.contents = res.data.contents;
+                    this.filePath = res.data.filePath;
                     this.currentItem = item;
                     // 이미지 데이터가 있는 경우 처리
                     if (res.data.image) {
@@ -353,20 +360,24 @@ export default {
                     // エラー処理
                 });
         },
-        edit() {
+        edit(event) {
             if (confirm('修正しますか？')) {
-                this.form = {
-                    seq: this.currentItem.seq,
-                    title: this.title,
-                    contents: this.contents
-                };
-                console.log(this.form);
-                axios.put("http://localhost:8080/edit/" + this.currentItem.seq, this.form)
+                this.editArticleForm.title = this.title;
+                this.editArticleForm.contents = this.contents;
+                event.preventDefault();
+
+                const formData = new FormData();
+                formData.append('image', this.editArticleForm.image);
+                formData.append('title', this.editArticleForm.title);
+                formData.append('contents', this.editArticleForm.contents);
+
+                console.log(formData);
+                axios.put("http://localhost:8080/edit/" + this.currentItem.seq, formData)
                     .then((res) => {
                         console.log(res);
                         alert('記事を修正しました');
                         this.$refs['edit-modal'].hide();
-                        search();
+                        this.search(); // search()をthis.search()に修正
                     })
                     .catch((err) => {
                         console.log(err);
