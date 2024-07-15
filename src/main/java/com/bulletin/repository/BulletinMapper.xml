@@ -51,7 +51,7 @@
 				AND title LIKE CONCAT('%',#{title}, '%')
 			</if>
 			<if
-				test='startDate != null and staÏrtDate != "" and endDate != null and endDate != ""'>
+				test='startDate != null and  startDate != "" and endDate != null and endDate != ""'>
 				AND create_date BETWEEN #{startDate} AND #{endDate}
 			</if>
 		</where>
