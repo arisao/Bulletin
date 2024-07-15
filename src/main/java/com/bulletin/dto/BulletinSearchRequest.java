@@ -12,8 +12,6 @@ public class BulletinSearchRequest{
 	private int seq;
 	private String title;
 	private String contents;
-	private String newTitle;
-	private String newContents;
 	private String startDate;
 	private String endDate;
     private String image;
