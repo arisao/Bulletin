@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <p>My page</p>
+        <p>My Page</p>
         <div>
             <b-form inline class="form-container">
                 <!-- 題名 -->
