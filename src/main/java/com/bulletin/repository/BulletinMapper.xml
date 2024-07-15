@@ -21,7 +21,7 @@
 				AND create_date BETWEEN #{startDate} AND #{endDate}
 			</if>
 		</where>
-		ORDER BY create_date ASC
+		ORDER BY create_date DESC
 	</select>
 
 	<select id="getArticle"
@@ -51,7 +51,7 @@
 				AND title LIKE CONCAT('%',#{title}, '%')
 			</if>
 			<if
-				test='startDate != null and startDate != "" and endDate != null and endDate != ""'>
+				test='startDate != null and staÏrtDate != "" and endDate != null and endDate != ""'>
 				AND create_date BETWEEN #{startDate} AND #{endDate}
 			</if>
 		</where>
@@ -66,9 +66,12 @@
 
 	<update id="editArticle" parameterType="map">
 		UPDATE info
-		SET title =
+		SET
+		title =
 		#{bulletin.title},
-		contents = #{bulletin.contents}
+		contents = #{bulletin.contents},
+		image_path =
+		#{bulletin.imagePath}
 		WHERE seq = #{seq}
 	</update>
 
