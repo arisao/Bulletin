@@ -16,8 +16,7 @@
 			<if test='title != null and title !=""'>
 				AND title LIKE CONCAT('%',#{title}, '%')
 			</if>
-			<if
-				test='startDate != null and startDate != "" and endDate != null and endDate != ""'>
+			<if test='startDate != null and startDate != "" and endDate != null and endDate != ""'>
 				AND create_date BETWEEN #{startDate} AND #{endDate}
 			</if>
 		</where>
@@ -61,7 +60,7 @@
 		INSERT INTO info (title,
 		contents, active_yn, image_path, create_date)
 		VALUES (#{title},
-		#{contents}, "y", #{imagePath}, #{create_date})
+		#{contents}, 'Y', #{imagePath}, #{create_date})
 	</insert>
 
 	<update id="editArticle" parameterType="map">
