@@ -96,8 +96,8 @@
                 <img :src="editUrl" class="border p-2" style="max-width: 100%;">
                 <!-- Cancel -->
                 <b-button type="button" variant="secondary border-light" class="position-absolute"
-                    style="left: 0;top: 0;" @click="deleteEditImage">
-                    削除
+                    style="left: 0;top: 0; color: pink;" @click="deleteEditImagePreview">
+                    新規削除
                 </b-button>
             </div>
             <!-- すでに画像がある場合 -->
@@ -276,15 +276,24 @@ export default {
         },
         //新規登録モーダルのイメージ削除メソッド
         deleteImage() {
+            this.imgData.image = null
             this.articleForm.image = null
             this.url = null
         },
-        //修正モーダルのイメージ削除メソッド
+        //修正モーダルのイメージ削除(既に画像が登録されている場合)メソッド
         deleteEditImage() {
             if (confirm('削除しますか？')) {
+                this.image = null;
+                this.image_path = null;
+                this.editArticleForm.image = null;
+            }
+        },
+        //修正モーダルのプレビュー削除メソッド
+        deleteEditImagePreview() {
+            if (confirm('削除しますか？')) {
+                this.editImgData.image = null
                 this.editArticleForm.image = null
                 this.editUrl = null
-                this.image = null;
             }
         },
         hideModal() {
@@ -393,7 +402,7 @@ export default {
                     if (res.data.image) {
                         this.image = `data:image/jpeg;base64,${res.data.image}`;
                     } else {
-                        this.image = ''; // 画像がない場合の処理
+                        this.image = null; // 画像がない場合の処理
                     }
                 })
                 .catch((err) => {
