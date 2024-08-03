@@ -38,52 +38,6 @@
                 </template>
             </b-table>
         </div>
-        <!-- 修正モーダル -->
-        <b-modal ref="edit-modal" size="xl" hide-footer title="記事修正">
-            <b-form-group label="題名" label-for="inline-form-input-name">
-                <b-form-input id="inline-form-input-name" v-model="title" :state="validation2"
-                    class="mb-2 mr-sm-2 mb-sm-0"></b-form-input>
-                <b-form-invalid-feedback :state="validation2">
-                    題名は1-50文字以内で入力して下さい
-                </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group label="記事" label-for="inline-form-input-article">
-                <b-form-input id="inline-form-input-article" v-model="contents" placeholder="記事を入力して下さい" rows="3"
-                    :state="validation3"></b-form-input>
-                <b-form-invalid-feedback :state="validation3">
-                    題名は1-50文字以内で入力して下さい
-                </b-form-invalid-feedback>
-            </b-form-group>
-            <p>写真アップロード</p>
-            <b-form-file accept="image/jpeg, image/png, image/gif" id="file-default"
-                @change="previewEdit"></b-form-file>
-            <!-- 修正モーダルで追加するファイルプレビュー -->
-            <div v-if="editUrl" class="position-relative my-2">
-                <img :src="editUrl" class="border p-2" style="max-width: 100%;">
-                <!-- Cancel -->
-                <b-button type="button" variant="secondary border-light" class="position-absolute"
-                    style="left: 0;top: 0;" @click="deleteImage">
-                    削除
-                </b-button>
-                <!-- <img>タグ　srcはパスにしないといけない -->
-            </div>
-            <div v-else class="position-relative my-2">
-                <!-- バイナリで表示 -->
-                <div v-if="image">
-                    <img :src="image" alt="Article Image" style="max-width: 100%;">
-                    <b-button type="button" variant="secondary border-light" class="position-absolute"
-                        style="left: 0;top: 0;" @click="deleteEditImage">
-                        削除
-                    </b-button>
-                </div>
-            </div>
-
-            <div class="d-flex justify-content-center">
-                <b-button class="mt-3 mr-2" variant="primary" @click="edit">修正</b-button>
-                <b-button class="mt-3" variant="secondary" @click="hideEditModal">閉じる</b-button>
-            </div>
-        </b-modal>
-
         <!-- 新規登録モーダル -->
         <b-modal ref="my-modal" size="xl" hide-footer title="新規記事登録">
             <b-form-group label="題名" label-for="inline-form-input-name">
@@ -116,7 +70,52 @@
                 <b-button class="mt-3 mr-2" variant="primary" @click="submit">登録</b-button>
                 <b-button class="mt-3" variant="secondary" @click="hideModal">閉じる</b-button>
             </div>
+        </b-modal>
+        <!-- 修正モーダル -->
+        <b-modal ref="edit-modal" size="xl" hide-footer title="記事修正">
+            <b-form-group label="題名" label-for="inline-form-input-name">
+                <b-form-input id="inline-form-input-name" v-model="title" :state="validation2"
+                    class="mb-2 mr-sm-2 mb-sm-0"></b-form-input>
+                <b-form-invalid-feedback :state="validation2">
+                    題名は1-50文字以内で入力して下さい
+                </b-form-invalid-feedback>
+            </b-form-group>
+            <b-form-group label="記事" label-for="inline-form-input-article">
+                <b-form-input id="inline-form-input-article" v-model="contents" placeholder="記事を入力して下さい" rows="3"
+                    :state="validation3"></b-form-input>
+                <b-form-invalid-feedback :state="validation3">
+                    題名は1-50文字以内で入力して下さい
+                </b-form-invalid-feedback>
+            </b-form-group>
+            <p>写真アップロード</p>
+            <b-form-file accept="image/jpeg, image/png, image/gif" id="file-default"
+                @change="previewEdit"></b-form-file>
+            <!-- 画像が登録されていない場合 -->
+            <!-- Browseで登録した画像を表示する -->
+            <div v-if="editUrl" class="position-relative my-2">
+                <img :src="editUrl" class="border p-2" style="max-width: 100%;">
+                <!-- Cancel -->
+                <b-button type="button" variant="secondary border-light" class="position-absolute"
+                    style="left: 0;top: 0;" @click="deleteEditImage">
+                    削除
+                </b-button>
+            </div>
+            <!-- すでに画像がある場合 -->
+            <div v-else class="position-relative my-2">
+                <!-- バイナリで表示 -->
+                <div v-if="image">
+                    <img :src="image" alt="Article Image" style="max-width: 100%;">
+                    <b-button type="button" variant="secondary border-light" class="position-absolute"
+                        style="left: 0;top: 0;" @click="deleteEditImage">
+                        削除
+                    </b-button>
+                </div>
+            </div>
 
+            <div class="d-flex justify-content-center">
+                <b-button class="mt-3 mr-2" variant="primary" @click="edit">修正</b-button>
+                <b-button class="mt-3" variant="secondary" @click="hideEditModal">閉じる</b-button>
+            </div>
         </b-modal>
 
 
@@ -188,7 +187,6 @@ export default {
             editImgData: {
                 image: null,
             },
-            image: '',
             currentItem: null,
             uploadedFile: '',
         }
@@ -264,29 +262,29 @@ export default {
             this.imgData.image = files[0]
             console.log(this.imgData.image);
             this.url = URL.createObjectURL(this.imgData.image)
-            //ファイrデータを追加
+            //ファイルデータを追加
             this.articleForm.image = this.imgData.image;
         },
         //修正モーダルで画像のプレビューを表示するメソッド
         previewEdit(event) {
             const files = event.target.files || event.dataTransfer.files
-            this.imgData.image = files[0]
-            console.log(this.imgData.image);
-            this.editUrl = URL.createObjectURL(this.imgData.image)
-            //ファイrデータを追加
-            this.editArticleForm.image = this.imgData.image;
+            this.editImgData.image = files[0]
+            console.log(this.editImgData.image);
+            this.editUrl = URL.createObjectURL(this.editImgData.image)
+            //ファイルデータを追加
+            this.editArticleForm.image = this.editImgData.image;
         },
         //新規登録モーダルのイメージ削除メソッド
         deleteImage() {
             this.articleForm.image = null
-            this.image = null
             this.url = null
         },
+        //修正モーダルのイメージ削除メソッド
         deleteEditImage() {
             if (confirm('削除しますか？')) {
                 this.editArticleForm.image = null
                 this.editUrl = null
-                this.image = '';
+                this.image = null;
             }
         },
         hideModal() {
@@ -391,11 +389,11 @@ export default {
                     this.image = res.data.image;
 
                     this.currentItem = item;
-                    // 이미지 데이터가 있는 경우 처리
+                    // 画像がある場合の処理
                     if (res.data.image) {
                         this.image = `data:image/jpeg;base64,${res.data.image}`;
                     } else {
-                        this.image = ''; // 이미지가 없는 경우 처리
+                        this.image = ''; // 画像がない場合の処理
                     }
                 })
                 .catch((err) => {
@@ -423,7 +421,7 @@ export default {
                         .then((res) => {
                             console.log(res);
                             alert('記事を修正しました');
-                            this.$refs['edit-modal'].hide();
+                            hideEditModal();
                             this.search(); // search()をthis.search()に修正
                         })
                         .catch((err) => {
@@ -434,11 +432,11 @@ export default {
 
         },
         hideEditModal() {
-            this.imgData.image = null
-            this.url = null
-            this.form = "";
-            this.$refs['edit-modal'].hide()
-        }
+            this.$refs['edit-modal'].hide();
+            this.editImgData.image = '';
+            this.editUrl = null
+            this.editArticleForm = "";
+        },
     }
 }
 </script>
