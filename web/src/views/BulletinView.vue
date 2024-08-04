@@ -96,8 +96,8 @@
                 <img :src="editUrl" class="border p-2" style="max-width: 100%;">
                 <!-- Cancel -->
                 <b-button type="button" variant="secondary border-light" class="position-absolute"
-                    style="left: 0;top: 0; color: pink;" @click="deleteEditImagePreview">
-                    新規削除
+                    style="left: 0;top: 0; " @click="deleteEditImagePreview">
+                    削除
                 </b-button>
             </div>
             <!-- すでに画像がある場合 -->
@@ -270,30 +270,31 @@ export default {
             const files = event.target.files || event.dataTransfer.files
             this.editImgData.image = files[0]
             console.log(this.editImgData.image);
+            console.log('型' + typeof this.editImgData.image);
             this.editUrl = URL.createObjectURL(this.editImgData.image)
             //ファイルデータを追加
             this.editArticleForm.image = this.editImgData.image;
         },
         //新規登録モーダルのイメージ削除メソッド
         deleteImage() {
-            this.imgData.image = null
-            this.articleForm.image = null
-            this.url = null
+            this.imgData.image = '';
+            this.articleForm.image = '';
+            this.url = '';
         },
         //修正モーダルのイメージ削除(既に画像が登録されている場合)メソッド
         deleteEditImage() {
             if (confirm('削除しますか？')) {
-                this.image = null;
-                this.image_path = null;
-                this.editArticleForm.image = null;
+                this.image = '';
+                this.imagePath = '';
+                this.editArticleForm.image = '';
             }
         },
         //修正モーダルのプレビュー削除メソッド
         deleteEditImagePreview() {
             if (confirm('削除しますか？')) {
-                this.editImgData.image = null
-                this.editArticleForm.image = null
-                this.editUrl = null
+                this.editImgData.image = '';
+                this.editArticleForm.image = '';
+                this.editUrl = '';
             }
         },
         hideModal() {
@@ -402,7 +403,7 @@ export default {
                     if (res.data.image) {
                         this.image = `data:image/jpeg;base64,${res.data.image}`;
                     } else {
-                        this.image = null; // 画像がない場合の処理
+                        this.image = ''; // 画像がない場合の処理
                     }
                 })
                 .catch((err) => {
@@ -430,7 +431,7 @@ export default {
                         .then((res) => {
                             console.log(res);
                             alert('記事を修正しました');
-                            hideEditModal();
+                            this.hideEditModal();
                             this.search(); // search()をthis.search()に修正
                         })
                         .catch((err) => {
@@ -443,7 +444,7 @@ export default {
         hideEditModal() {
             this.$refs['edit-modal'].hide();
             this.editImgData.image = '';
-            this.editUrl = null
+            this.editUrl = '';
             this.editArticleForm = "";
         },
     }
