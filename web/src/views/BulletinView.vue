@@ -273,28 +273,32 @@ export default {
             console.log('型' + typeof this.editImgData.image);
             this.editUrl = URL.createObjectURL(this.editImgData.image)
             //ファイルデータを追加
+            //エラー
+
             this.editArticleForm.image = this.editImgData.image;
         },
         //新規登録モーダルのイメージ削除メソッド
         deleteImage() {
             this.imgData.image = '';
-            this.articleForm.image = '';
+            // this.articleForm.image = '';
             this.url = '';
         },
         //修正モーダルのイメージ削除(既に画像が登録されている場合)メソッド
         deleteEditImage() {
             if (confirm('削除しますか？')) {
                 this.image = '';
-                this.imagePath = '';
-                this.editArticleForm.image = '';
+                //this.imagePath = '';
+                // this.editArticleForm.image = '';
             }
         },
         //修正モーダルのプレビュー削除メソッド
         deleteEditImagePreview() {
             if (confirm('削除しますか？')) {
+                if (this.editUrl) {
+                    URL.revokeObjectURL(this.editUrl);
+                    this.editUrl = '';
+                }
                 this.editImgData.image = '';
-                this.editArticleForm.image = '';
-                this.editUrl = '';
             }
         },
         hideModal() {
@@ -397,6 +401,7 @@ export default {
                     this.contents = res.data.contents;
                     this.imagePath = res.data.image_path;
                     this.image = res.data.image;
+                    console.log(typeof image);
 
                     this.currentItem = item;
                     // 画像がある場合の処理
@@ -417,12 +422,17 @@ export default {
                     alert("必須項目を入力してください")
                 }
                 else {
+                    //エラー
+                    console.log(typeof this.editArticleForm.image);
+                    console.log(typeof this.editArticleForm.image);
                     this.editArticleForm.title = this.title;
                     this.editArticleForm.contents = this.contents;
-                    event.preventDefault();
+                    // event.preventDefault();
 
                     const formData = new FormData();
-                    formData.append('image', this.editArticleForm.image);
+                    if (this.editArticleForm.image) {
+                        formData.append('image', this.editArticleForm.image);
+                    }
                     formData.append('title', this.editArticleForm.title);
                     formData.append('contents', this.editArticleForm.contents);
 
@@ -445,7 +455,7 @@ export default {
             this.$refs['edit-modal'].hide();
             this.editImgData.image = '';
             this.editUrl = '';
-            this.editArticleForm = "";
+            this.editArticleForm = {};
         },
     }
 }
