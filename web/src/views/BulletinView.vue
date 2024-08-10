@@ -39,7 +39,7 @@
             </b-table>
         </div>
         <!-- 新規登録モーダル -->
-        <b-modal ref="my-modal" size="xl" hide-footer title="新規記事登録">
+        <b-modal ref="my-modal" size="xl" hide-footer title="新規記事登録" @hide="onModalHide">
             <b-form-group label="題名" label-for="inline-form-input-name">
                 <b-form-input id="inline-form-input-name" v-model="newTitle" :state="validation"
                     class="mb-2 mr-sm-2 mb-sm-0" placeholder="題名を入力して下さい"></b-form-input>
@@ -72,7 +72,7 @@
             </div>
         </b-modal>
         <!-- 修正モーダル -->
-        <b-modal ref="edit-modal" size="xl" hide-footer title="記事修正">
+        <b-modal ref="edit-modal" size="xl" hide-footer title="記事修正" @hide=onEditModalHide>
             <b-form-group label="題名" label-for="inline-form-input-name">
                 <b-form-input id="inline-form-input-name" v-model="title" :state="validation2"
                     class="mb-2 mr-sm-2 mb-sm-0"></b-form-input>
@@ -272,9 +272,6 @@ export default {
             console.log(this.editImgData.image);
             console.log('型' + typeof this.editImgData.image);
             this.editUrl = URL.createObjectURL(this.editImgData.image)
-            //ファイルデータを追加
-            //エラー
-
             this.editArticleForm.image = this.editImgData.image;
         },
         //新規登録モーダルのイメージ削除メソッド
@@ -305,8 +302,16 @@ export default {
             this.$refs['my-modal'].hide()
             this.newTitle = '';
             this.newContents = '';
+            this.url = '';
             this.imgData.image = '';
-            this.articleForm = '';
+            this.articleForm = {};
+        },
+        onModalHide() {
+            this.newTitle = '';
+            this.newContents = '';
+            this.url = '';
+            this.imgData.image = '';
+            this.articleForm = {};
         },
         search() {
             // 入力した値を格納する
@@ -422,12 +427,9 @@ export default {
                     alert("必須項目を入力してください")
                 }
                 else {
-                    //エラー
-                    console.log(typeof this.editArticleForm.image);
-                    console.log(typeof this.editArticleForm.image);
                     this.editArticleForm.title = this.title;
                     this.editArticleForm.contents = this.contents;
-                    // event.preventDefault();
+                    event.preventDefault();
 
                     const formData = new FormData();
                     if (this.editArticleForm.image) {
@@ -457,6 +459,11 @@ export default {
             this.editUrl = '';
             this.editArticleForm = {};
         },
+        onEditModalHide() {
+            this.editImgData.image = '';
+            this.editUrl = '';
+            this.editArticleForm = {};
+        }
     }
 }
 </script>
