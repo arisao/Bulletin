@@ -70,7 +70,9 @@
 		#{bulletin.title},
 		contents = #{bulletin.contents},
 		image_path =
-		#{bulletin.imagePath}
+		#{bulletin.imagePath},
+		create_date =
+		#{bulletin.create_date}
 		WHERE seq = #{seq}
 	</update>
 
@@ -80,5 +82,6 @@
 		set active_yn = 'N'
 		where seq = ${seq}
 	</update>
+
 
 </mapper>
