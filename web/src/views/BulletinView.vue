@@ -3,10 +3,10 @@
         <p>My page</p>
         <div>
             <b-form inline class="form-container">
-                <!-- 題名 -->
+                <!-- タイトル -->
                 <div class="d-flex align-items-center">
-                    <p class="mb-0 mr-2">題名</p>
-                    <input id="inline-form-input-name" v-model="searchTitle" type="text" placeholder="題名を入力して下さい"
+                    <p class="mb-0 mr-2">タイトル</p>
+                    <input id="inline-form-input-name" v-model="searchTitle" type="text" placeholder="タイトルを入力して下さい"
                         class="mr-sm-2 form-control">
                 </div>
                 <!-- 日付 -->
@@ -39,17 +39,17 @@
             </b-table>
         </div>
         <!-- 新規登録モーダル -->
-        <b-modal ref="my-modal" size="xl" hide-footer title="新規記事登録" @hide="onModalHide">
-            <b-form-group label="題名" label-for="inline-form-input-name">
+        <b-modal ref="my-modal" size="xl" hide-footer title="新規内容登録" @hide="onModalHide">
+            <b-form-group label="タイトル" label-for="inline-form-input-name">
                 <b-form-input id="inline-form-input-name" v-model="newTitle" :state="validation"
-                    class="mb-2 mr-sm-2 mb-sm-0" placeholder="題名を入力して下さい"></b-form-input>
+                    class="mb-2 mr-sm-2 mb-sm-0" placeholder="タイトルを入力して下さい"></b-form-input>
                 <b-form-invalid-feedback :state="validation">
-                    題名は1-50文字以内で入力して下さい
+                    タイトルは1-50文字以内で入力して下さい
                 </b-form-invalid-feedback>
             </b-form-group>
-            <b-form-group label="記事" label-for="inline-form-input-article" :state="!isInvalid"
-                invalid-feedback="記事は1-1000文字で入力して下さい">
-                <b-form-textarea id="inline-form-input-article" v-model="newContents" placeholder="記事を入力して下さい" rows="3"
+            <b-form-group label="内容" label-for="inline-form-input-article" :state="!isInvalid"
+                invalid-feedback="内容は1-1000文字で入力して下さい">
+                <b-form-textarea id="inline-form-input-article" v-model="newContents" placeholder="内容を入力して下さい" rows="3"
                     :state="!isInvalid" @input="validate"></b-form-textarea>
             </b-form-group>
             <!-- ファイルインプット -->
@@ -72,19 +72,19 @@
             </div>
         </b-modal>
         <!-- 修正モーダル -->
-        <b-modal ref="edit-modal" size="xl" hide-footer title="記事修正" @hide=onEditModalHide>
-            <b-form-group label="題名" label-for="inline-form-input-name">
+        <b-modal ref="edit-modal" size="xl" hide-footer title="内容修正" @hide=onEditModalHide>
+            <b-form-group label="タイトル" label-for="inline-form-input-name">
                 <b-form-input id="inline-form-input-name" v-model="title" :state="validation2"
                     class="mb-2 mr-sm-2 mb-sm-0"></b-form-input>
                 <b-form-invalid-feedback :state="validation2">
-                    題名は1-50文字以内で入力して下さい
+                    タイトルは1-50文字以内で入力して下さい
                 </b-form-invalid-feedback>
             </b-form-group>
-            <b-form-group label="記事" label-for="inline-form-input-article">
-                <b-form-input id="inline-form-input-article" v-model="contents" placeholder="記事を入力して下さい" rows="3"
+            <b-form-group label="内容" label-for="inline-form-input-article">
+                <b-form-input id="inline-form-input-article" v-model="contents" placeholder="内容を入力して下さい" rows="3"
                     :state="validation3"></b-form-input>
                 <b-form-invalid-feedback :state="validation3">
-                    題名は1-50文字以内で入力して下さい
+                    タイトルは1-50文字以内で入力して下さい
                 </b-form-invalid-feedback>
             </b-form-group>
             <p>写真アップロード</p>
@@ -240,7 +240,7 @@ export default {
                 axios.put('http://localhost:8080/delete/' + item.seq, this.form)
                     .then((res) => {
                         console.log(res);
-                        alert('記事を削除しました');
+                        alert('内容を削除しました');
                         this.search();
                     })
                     .catch((err) => {
@@ -442,7 +442,7 @@ export default {
                     axios.put("http://localhost:8080/edit/" + this.currentItem.seq, formData)
                         .then((res) => {
                             console.log(res);
-                            alert('記事を修正しました');
+                            alert('内容を修正しました');
                             this.hideEditModal();
                             this.search(); // search()をthis.search()に修正
                         })
