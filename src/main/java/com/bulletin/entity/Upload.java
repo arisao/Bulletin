@@ -1,7 +1,5 @@
 package com.bulletin.entity;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import lombok.Data;
 
 //掲示板情報Entity

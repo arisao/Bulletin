@@ -2,33 +2,22 @@ package com.bulletin.controller;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bulletin.dto.BulletinSearchRequest;
 import com.bulletin.entity.Bulletin;
-import com.bulletin.entity.bulletinEdit;
 import com.bulletin.service.BulletinService;
-
-import lombok.extern.java.Log;
 
 /*
  * 掲示板 Controller
@@ -56,6 +45,23 @@ public class BulletinController {
 	 */
 	@PostMapping(value = "/bulletin")
 	public Map<String, Object> search(@RequestBody BulletinSearchRequest bulletinSearchRequest) {
+		var response = bulletinService.search(bulletinSearchRequest);
+		var totalCount = bulletinService.searchCount(bulletinSearchRequest);
+		Map<String, Object> result = new HashMap<>();
+		result.put("response", response);
+		result.put("totalCount", totalCount);
+		return result;
+	}
+
+	/*
+	 * 検索
+	 * 
+	 * @param bulletinSearchRequest
+	 * 
+	 * @return 検索結果一覧
+	 */
+	@GetMapping(value = "/bulletin")
+	public Map<String, Object> searchArticle(@RequestBody BulletinSearchRequest bulletinSearchRequest) {
 		var response = bulletinService.search(bulletinSearchRequest);
 		var totalCount = bulletinService.searchCount(bulletinSearchRequest);
 		Map<String, Object> result = new HashMap<>();
@@ -124,5 +130,17 @@ public class BulletinController {
 	@PutMapping(value = "/delete/{seq}")
 	public void delete(@PathVariable String seq, @RequestBody Bulletin bulletin) {
 		bulletinService.delete(seq, bulletin);
+	}
+
+	/*
+	 * 画像削除
+	 * 
+	 * @param bulletinSearchRequest
+	 * 
+	 * @return 掲示板一覧画面
+	 */
+	@PutMapping(value = "/deleteImage/{seq}")
+	public void deleteImage(@PathVariable String seq, @RequestBody Bulletin bulletin) {
+		bulletinService.deleteImage(seq, bulletin);
 	}
 }

@@ -24,4 +24,6 @@ public interface BulletinMapper {
 	void deleteArticle(String seq, Bulletin bulletin);
 
 	int editArticle(@Param("seq") String seq, @Param("bulletin") bulletinEdit bulletin);
+
+	void deleteImage(String seq, Bulletin bulletin);
 }
