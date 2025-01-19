@@ -11,10 +11,12 @@ const routes = [
     name: 'BulletinView',
     component: BulletinView
   },
+  //ログイン必須ページ
   {
     path: '/home',
     name: 'MainBulletin',
-    component: MainBulletin
+    component: MainBulletin,
+    meta: { requiresAuth: true }
   },
   {
     path: '/login',
@@ -26,6 +28,18 @@ const routes = [
 const router = new VueRouter({
   mode: 'history',
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (Object.keys(store.state.userInfo).length) {
+      next()
+      //ユーザーが認証されていない場合、/にリダイレクト。
+    } else {
+      next({ path: '/', query: { redirect: to.fullPath }})
+    }
+  }
+  next()
 })
 
 export default router
