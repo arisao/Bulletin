@@ -14,7 +14,7 @@
                 </b-form-text>
             </b-form>
             <div class="buttonLocation">
-                <b-button type="login" variant="primary">Login</b-button>
+                <b-button type="login" variant="primary" @click="login">Login</b-button>
                 <b-button type="reset" variant="danger">Cencel</b-button>
             </div>
         </b-form>
@@ -22,6 +22,9 @@
 </template>
 
 <script>
+import Login from '@/views/Login.vue';
+import axios from 'axios'; // axiosをインポート
+import bcrypt from 'bcryptjs';
 export default {
     data() {
         return {
@@ -32,22 +35,58 @@ export default {
             show: true
         }
     },
+    computed: {
+    },
     methods: {
-        onLogin(event) {
-            event.preventDefault()
-            alert(JSON.stringify(this.form))
-        },
-        onReset(event) {
-            event.preventDefault()
-            // Reset our form values
-            this.form.id = ''
-            // Trick to reset/clear native browser form validation state
-            this.show = false
-            this.$nextTick(() => {
-                this.show = true
-            })
+        //awaitを使っている
+        async onLogin(event) {
+            event.preventDefault();
+
+            // ロード中状態を設定
+            this.isBusy = true;
+            // パスワードをハッシュ化
+            const salt = bcrypt.genSaltSync(10); // 同期的にソルトを生成
+            const hashedPassword = bcrypt.hashSync(this.form.password); // パスワードをハッシュ化
+
+            // ハッシュ化されたパスワードをフォームに設定
+            const data = {
+                id: this.form.id,
+                password: hashedPassword
+            };
+
+            // postは非同期、ポストが戻ってくるまで待つのがawait
+            //非同期だが同期にする。
+            //非同期の他のメソッド fetch
+            try {
+                // 環境変数でエンドポイントを管理
+                const response = await axios.post(`http://localhost:8080/login`, data);
+                console.log(response);
+                this.$router.push({
+                    path: '/bulletin'
+                })
+            } catch (error) {
+                console.error(error);
+                // ユーザーにエラーメッセージを表示
+                this.errorMessage = "ログインに失敗しました。IDまたはパスワードを確認してください。";
+            } finally {
+                // ロード中状態を解除
+                this.isBusy = false;
+                //login visibleがtrue
+            }
         }
-    }
+    },
+    //postは非同期
+    onReset(event) {
+        event.preventDefault()
+        // Reset our form values
+        this.form.id = ''
+        this.form.password = ''
+        // Trick to reset/clear native browser form validation state
+        this.show = false
+        this.$nextTick(() => {
+            this.show = true
+        })
+    },
 }
 </script>
 
