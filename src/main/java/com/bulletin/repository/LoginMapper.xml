@@ -3,9 +3,11 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bulletin.repository.LoginMapper">
-	<select id="login" parameterType="com.bulletin.entity.UserEntity">
+	<select id="login" parameterType="com.bulletin.entity.UserEntity" resultType="com.bulletin.dto.LoginResultDto">
 		SELECT
-		*
+		id,
+		user_name,
+		password
 		FROM
 		user
 		<where>
