@@ -27,10 +27,10 @@
           <b-nav-item-dropdown right>
             <!-- Using 'button-content' slot -->
             <template #button-content>
-              <em>User</em>
+              <em>userId</em>
             </template>
 <b-dropdown-item href="#">Profile</b-dropdown-item>
-<b-dropdown-item href="#">Sign Out</b-dropdown-item>
+<b-dropdown-item href="#" @click="logout">Sign Out</b-dropdown-item>
 </b-nav-item-dropdown>
 </b-navbar-nav>
 </b-collapse>
@@ -38,9 +38,39 @@
 </div>
 </template>
 <script>
+import { onMounted } from 'vue';
+import axios from 'axios';
 export default {
-
+  methods: {
+    logout() {
+      axios.get(`http://localhost:8080/logout`)
+        .then((res) => {
+          console.log(res);
+          this.$router.push("/login");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    getUserId() {
+      const userId = sessionStorage.getItem('userId');
+      console.log("ユーザー");
+      console.log(userId);
+    },
+    // window: onload = function () {
+    //   console.log("onload");
+    // }
+  }
 }
+</script>
+<script setup>
+import { onMounted } from 'vue';
+//サーバー
+onMounted(() => {
+  console.log('ああああ');
+  const userId = sessionStorage.getAttribute('userId');
+  console.log(userId);
+});
 </script>
 <style lang="">
 

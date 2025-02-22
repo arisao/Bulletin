@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <Header />
         <p>My page</p>
         <div>
             <b-form inline class="form-container">
@@ -117,8 +118,13 @@
 
 <script>
 import axios from 'axios'; // axiosをインポート
+import Header from "./components/layout/Header.vue";
+
 
 export default {
+    components: {
+        Header,
+    },
     data() {
         const today = new Date();
         const yesterday = new Date(today);
