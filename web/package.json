@@ -9,18 +9,22 @@
   "dependencies": {
     "autoprefixer": "^9.8.0",
     "axios": "^1.6.7",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "bootstrap": "^4.6.2",
     "bootstrap-vue": "^2.23.1",
     "core-js": "^3.8.3",
     "package-name": "^0.1.0",
     "vue": "^2.7.16",
     "vue-router": "^2.8.1",
+    "vue-session": "^1.0.0",
     "vue2-datepicker": "^3.11.1"
   },
   "devDependencies": {
     "@vue/cli": "^5.0.8",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",
+    "@vue/cli-plugin-vuex": "~5.0.0",
     "@vue/cli-service": "^5.0.8"
   },
   "browserslist": [

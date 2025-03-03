@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <p>My page</p>
+        <MenuView />
         <div>
             <b-form inline class="form-container">
                 <!-- タイトル -->
@@ -131,8 +131,10 @@
 
 <script>
 import axios from 'axios'; // axiosをインポート
+import MenuView from '@/components/MenuView.vue';
 
 export default {
+    components: { MenuView },
     data() {
         const today = new Date();
         const yesterday = new Date(today);

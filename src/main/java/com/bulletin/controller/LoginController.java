@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bulletin.entity.UserEntity;
 import com.bulletin.service.LoginService;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -49,12 +50,13 @@ public class LoginController {
 			}
 			result.put("response", responseData);
 
-			HttpSession session = request.getSession();
+			HttpSession session = request.getSession(true);
+			logger.info("セッションID: {}", session.getId());
+
 			session.setAttribute("userId", userEntity.getId());
 
 			// Set-Cookie ヘッダーを追加
-			response.setHeader("Set-Cookie",
-					"JSESSIONID=" + session.getId() + "; Path=/; HttpOnly; SameSite=None; Secure");
+			response.setHeader("Set-Cookie", "JSESSIONID=" + session.getId() + "; Path=/; HttpOnly; SameSite=LAX;");
 
 			logger.info("Set-Cookie ヘッダー設定: JSESSIONID={}", session.getId());
 		} catch (Exception e) {
@@ -65,10 +67,28 @@ public class LoginController {
 	}
 
 	@GetMapping(value = "/logout")
-	public String logout(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		logger.info("ログアウト", session.getAttribute("userId"));
-		session.invalidate();
+	public String logout(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession(false);
+		if (session != null) {
+			Object userId = session.getAttribute("userId");
+			logger.info("ログアウト: userId={}", userId);
+			// invalidate前にログ出力
+			logger.info("ログアウト時のセッションID: {}", session.getId());
+			session.invalidate();
+			logger.info("セッションを無効化しました: sessionId={}", session.getId());
+			// セッションを完全にリセットするために新しいセッションを生成
+			request.getSession(true);
+		} else {
+			logger.info("セッションなしでログアウト処理");
+		}
+
+		// JSESSIONID クッキーを削除
+		Cookie cookie = new Cookie("JSESSIONID", null);
+		cookie.setPath("/");
+		cookie.setHttpOnly(true);
+		cookie.setMaxAge(0);
+		response.addCookie(cookie);
+
 		return "/login";
 
 	}

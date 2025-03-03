@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <google-login></google-login>
         <p>Home</p>
         <div>
             <b-form inline class="form-container">
@@ -91,8 +92,10 @@
 
 <script>
 import axios from 'axios'; // axiosをインポート
+import GoogleLogin from '../components/GoogleLogin.vue';
 
 export default {
+  components: { GoogleLogin },
     data() {
         const today = new Date();
         const yesterday = new Date(today);
