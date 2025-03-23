@@ -6,6 +6,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,13 +51,13 @@ public class LoginController {
 				logger.warn("ログイン API: ユーザーが見つかりません");
 			}
 			result.put("response", responseData);
-
+			// セッションを生成、クライアントサイドからヘッダーの情報をとってくる。
 			HttpSession session = request.getSession(true);
 			logger.info("セッションID: {}", session.getId());
-
+			// key, value
 			session.setAttribute("userId", userEntity.getId());
-
-			// Set-Cookie ヘッダーを追加
+			//
+			// Set-Cookie クッキーをヘッダーに詰めているそれがクライアントにかえる
 			response.setHeader("Set-Cookie", "JSESSIONID=" + session.getId() + "; Path=/; HttpOnly; SameSite=LAX;");
 
 			logger.info("Set-Cookie ヘッダー設定: JSESSIONID={}", session.getId());
@@ -91,6 +93,21 @@ public class LoginController {
 
 		return "/login";
 
+	}
+
+	/*
+	 * sessionが有効かを判断
+	 * 
+	 * @param session
+	 * 
+	 * @return ResponseEntity
+	 */
+	@GetMapping("/check-session")
+	public ResponseEntity<?> checkSession(HttpSession session) {
+		if (session.getAttribute("user") == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+		}
+		return ResponseEntity.ok().body("Authenticated");
 	}
 
 }

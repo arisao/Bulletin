@@ -1,5 +1,5 @@
 <template lang="">
-   <div>
+<div>
     <b-navbar toggleable="lg" type="dark" variant="info">
       <b-navbar-brand href="#">bulletin</b-navbar-brand>
   
@@ -27,7 +27,7 @@
           <b-nav-item-dropdown right>
             <!-- Using 'button-content' slot -->
             <template #button-content>
-              <em>userId</em>
+              <em>{{ userId }}</em>
             </template>
 <b-dropdown-item href="#">Profile</b-dropdown-item>
 <b-dropdown-item href="#" @click="logout">Sign Out</b-dropdown-item>
@@ -43,20 +43,26 @@ import axios from 'axios';
 export default {
   methods: {
     logout() {
-      axios.get(`http://localhost:8080/logout`)
+      console.log("ログアウト");
+      console.log(document.cookie);
+      axios.get(`http://localhost:8080/logout`, { withCredentials: true })
         .then((res) => {
           console.log(res);
+          //クッキーを消しただけではセッション情報は消えない。
+          document.cookie = "JSESSIONID=; Path=/; HttpOnly; Max-Age=0;";
+          //sessionStorageからuserIdを消す
+          sessionStorage.removeItem("userId");
           this.$router.push("/login");
         })
         .catch((err) => {
           console.log(err);
         });
     },
-    getUserId() {
-      const userId = sessionStorage.getItem('userId');
-      console.log("ユーザー");
-      console.log(userId);
-    },
+    // getUserId() {
+    //   const userId = sessionStorage.getItem('userId');
+    //   console.log("ユーザー");
+    //   console.log(userId);
+    // },
     // window: onload = function () {
     //   console.log("onload");
     // }
@@ -64,12 +70,17 @@ export default {
 }
 </script>
 <script setup>
-import { onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
+
+const userId = ref(null);
+
 //サーバー
+//１ページ１ページ生成していない。１ページ目の段階で必要な資材をダウンロード。
+//画面を作り替えている domはhtmlのタグ。
 onMounted(() => {
   console.log('ああああ');
-  const userId = sessionStorage.getAttribute('userId');
-  console.log(userId);
+  userId.value = sessionStorage.getItem('userId');
+  console.log(userId.value);
 });
 </script>
 <style lang="">

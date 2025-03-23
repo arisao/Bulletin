@@ -34,11 +34,12 @@ export default {
         };
     },
     methods: {
+        //サーバーで保存したセッション情報をクライアント側で保存ができていない!!!
         async onLogin(event) {
             event.preventDefault();
             this.isBusy = true;
 
-            console.log("Before hashing:", this.form.password); // ← ここで確認
+            console.log("Before hashing:", this.form.password);
 
             const uint8 = new TextEncoder().encode(this.form.password);
             const digest = await crypto.subtle.digest('SHA-256', uint8);
@@ -46,7 +47,7 @@ export default {
                 .map(v => v.toString(16).padStart(2, '0'))
                 .join('');
 
-            console.log("After hashing:", hashedPassword); // ← ここで確認
+            console.log("After hashing:", hashedPassword);
 
             const data = {
                 id: this.form.id,
@@ -54,8 +55,15 @@ export default {
             };
 
             try {
-                const response = await axios.post(`http://localhost:8080/login`, data);
+                //axios独特のもの、クッキー情報が入っていることを表す
+                //ヘッダーにセッション情報をセットする
+                const response = await axios.post(`http://localhost:8080/login`, data, { withCredentials: true });
+
                 console.log(response);
+
+                // セッション情報を保存（クライアント側）
+                sessionStorage.setItem("userId", this.form.id);
+
                 this.$router.push({ name: 'BulletinView' });
             } catch (error) {
                 console.error(error);
@@ -63,6 +71,8 @@ export default {
             } finally {
                 this.isBusy = false;
             }
+            console.log("クッキー情報")
+            console.log(document.cookie);
         },
         onReset() {
             console.log("Resetting form:", this.form);

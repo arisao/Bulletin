@@ -15,5 +15,6 @@ public class Bulletin {
 	private String startDate;
 	private String endDate;
 	private String imageFile;
+	private String authorId;
 
 }

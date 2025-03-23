@@ -8,7 +8,8 @@
 		seq,
 		title,
 		contents,
-		create_date
+		create_date,
+		author_id as authorId
 		FROM
 		info
 		<where>

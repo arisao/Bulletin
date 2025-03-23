@@ -115,7 +115,7 @@ public class BulletinController {
 			return "Update successful";
 		} catch (IOException e) {
 			e.printStackTrace();
-			return "Updaate failed";
+			return "Update failed";
 		}
 	}
 

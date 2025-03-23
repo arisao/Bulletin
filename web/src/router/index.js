@@ -3,20 +3,22 @@ import VueRouter from 'vue-router'
 import BulletinView from '../views/BulletinView.vue'
 import MainBulletin from '../views/MainBulletin.vue'
 import Login from '../views/Login.vue'
+
 Vue.use(VueRouter)
+
 
 const routes = [
   {
     path: '/bulletin',
     name: 'BulletinView',
-    component: BulletinView
+    component: BulletinView,
+    meta: { requiresAuth: true }
   },
   //ログイン必須ページ
   {
     path: '/home',
     name: 'MainBulletin',
-    component: MainBulletin,
-    meta: { requiresAuth: true }
+    component: MainBulletin
   },
   {
     path: '/login',
@@ -31,15 +33,15 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (Object.keys(store.state.userInfo).length) {
-      next()
-      //ユーザーが認証されていない場合、/にリダイレクト。
-    } else {
-      next({ path: '/', query: { redirect: to.fullPath }})
-    }
+//toが移動するurl
+//fromが現在のurl
+//nextがtoから指定したurlに移動するため必ず呼び出さなければならない関数
+  const isAuthenticated = !!sessionStorage.getItem('userId');
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next('/login');
+  } else {
+    next();
   }
-  next()
-})
+});
 
 export default router

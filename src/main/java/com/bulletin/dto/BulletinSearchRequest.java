@@ -12,6 +12,7 @@ public class BulletinSearchRequest {
 	private String startDate;
 	private String endDate;
 	private String image;
+	private String authorId;
 	private int offset;
 	private int limit;
 
